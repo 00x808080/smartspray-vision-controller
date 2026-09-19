@@ -1,0 +1,6 @@
+# Out-of-source CMake build directories.
+/build/
+/build-*/
+/cmake-build-*/
+/CMakeUserPresets.json
+/.local/
