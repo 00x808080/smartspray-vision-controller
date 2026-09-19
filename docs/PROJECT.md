@@ -1,6 +1,6 @@
 # Project specification
 
-This document is the M0 design baseline, not a description of implemented behavior. M1.1 has not started. See the [README](../README.md) for the current implementation and environment status.
+This document retains the M0 technical contract. M1.1 is implemented and tested; M1.2 and later milestones have not started. See the [README](../README.md) for implemented capabilities and verified build/run commands.
 
 ## Purpose and scope
 
@@ -99,7 +99,7 @@ In a future batch, reject an invalid target independently without removing valid
 
 The first implementation slice is a minimal C++17 executable that calculates one pulse and executes it virtually. No neural network, GPU, or Python is needed. A Linux toolchain smoke test establishes environment readiness only; the first actual application build and tests belong to M1.1.
 
-Planned files; none are implemented yet:
+Implemented M1.1 files:
 
 | File | Purpose |
 |---|---|
@@ -113,7 +113,7 @@ No external test framework, JSON parser, CLI configurator, or separate clock/exe
 
 Reference input: `pitch = 0.25 m`, `x = 0.625 m`, `forward = 1.0 m`, `speed = 2.0 m/s`, `capture = 1_000_000 us`, `now = 1_100_000 us`, `delay = 50_000 us`, `pulse = 100_000 us`. Expected: channel `2`, arrival `1_500_000 us`, ON `1_450_000 us`, OFF `1_550_000 us`. See the [walkthrough](LEARNING.md).
 
-M1.1 acceptance criteria (**not yet tested**):
+M1.1 acceptance criteria (**verified in Debug and Release: 1 CTest test with 20 named scenarios in each configuration; repeated demo output matched the reference**):
 
 | Check | Expected result |
 |---|---|
