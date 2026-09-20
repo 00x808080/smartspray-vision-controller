@@ -1,6 +1,6 @@
 # Project specification
 
-This document retains the M0 technical contract. M1.1 is implemented and tested; M1.2 and later milestones have not started. See the [README](../README.md) for implemented capabilities and verified build/run commands.
+This document retains the M0 coordinate/time contract and records the explicit M1.2 batch clarifications. M1.1 and M1.2 are implemented and tested; later milestones have not started. See the [README](../README.md) for implemented capabilities and verified build/run commands.
 
 ## Purpose and scope
 
@@ -18,10 +18,10 @@ These are logical steps, not a requirement for separate classes, processes, or p
 |---|---|---|
 | CV baseline; later C++ inference | One image → detections with class, score, and a selected point in pixels | Find candidate plants; M2/M3 |
 | Target selection and coordinate mapping | Detections + specified geometry → `Target` | Separate plant semantics and pixels from controller logic; M2–M4 |
-| Controller planner | `Target` + `Config` + `now_us` → `Pulse` or a rejection reason | Select a channel and command times independently of CV; M1 |
-| Virtual execution and event log | Pulses + time advancement → ON/OFF events and eight channel states | Check commands deterministically and present the result; M1/M4 |
+| Controller planner | Targets + one `Config` + one `now_us` → original results, merged intervals, and schedule, or a shared failure | Select a channel and command times independently of CV; M1 |
+| Virtual execution and event log | Complete schedule + time advancement → ON/OFF events and eight channel states | Check commands deterministically and present the result; M1/M4 |
 
-M1.1 passes structures directly within one C++ executable. It needs no external interchange format. M2 may use one small JSON file with `schema_version`, units, and targets; define its exact schema when the Python/C++ boundary exists. Network services and a general-purpose serializer are unnecessary.
+M1 passes structures directly within one C++ executable. It needs no external interchange format. M2 may use one small JSON file with `schema_version`, units, and targets; define its exact schema when the Python/C++ boundary exists. Network services and a general-purpose serializer are unnecessary.
 
 ## Coordinates and units
 
@@ -51,7 +51,10 @@ The image domain is `0 <= u_px < image_width_px` and `0 <= v_px < image_height_p
 | `Config` | `nozzle_pitch_m`, `speed_mps`, `actuator_delay_us`, `pulse_duration_us`; channel count is fixed at 8 |
 | `now_us` | Time when the target becomes available to the controller; `0 <= capture_time_us <= now_us` |
 | `Pulse` | `target_id`, `nozzle_index`, `arrival_time_us`, `on_time_us`, `off_time_us` |
-| Rejection | `target_id` and a specific reason; no pulse is created |
+| `Rejection` | `target_id` and a specific reason; no pulse is created |
+| `MergedInterval` | `nozzle_index`, `on_time_us`, `off_time_us`, sorted unique `source_target_ids`; no synthetic target ID or arrival time |
+| `BatchPlan` | Input-ordered `target_results` containing original `Pulse`/`Rejection` records, `merged_intervals`, and the complete `schedule` |
+| `BatchFailure` | Shared `INVALID_CONFIG` or `INVALID_TIMESTAMP`; a separate alternative with no executable schedule |
 | Event log | `event_time_us`, `nozzle_index`, `ON`/`OFF`; channel states are listed in order `0..7` |
 
 Time is monotonic and virtual, measured from a shared run origin. It is neither UTC nor an OS clock. Targets from one frame share `capture_time_us`. The difference `now_us - capture_time_us` already represents the simulated processing delay: do not subtract inference time again. Later, actual measured inference duration is reported as a separate metric.
@@ -75,8 +78,10 @@ If `on_time_us < now_us`, return `TOO_LATE`. Do not backdate the command or repl
 - Command state ON occupies the half-open interval `[on_time_us, off_time_us)`. At `off_time_us`, the state is already OFF.
 - With the same fixed delay for switching on and off, the assumed effective interval is shifted by `actuator_delay_us`. The target reaches the bar at the **start** of the effective pulse, not its midpoint. This is a demo convention; spray width, fluid behavior, and physical plant coverage are not modeled.
 - `advance_to(t)` applies every unexecuted event with time `<= t` in chronological order and preserves original timestamps in the log. Advancing directly past OFF still emits both events. Repeating a time emits no duplicate events; moving backward returns `CLOCK_REWIND` without changing state.
-- M1.1 accepts exactly one target and one pulse. Before handling multiple targets in M1.2, merge both overlapping **and touching** intervals on the same channel; otherwise an earlier OFF may truncate a longer pulse.
-- In M1.2, plan the whole batch before execution. `target_id` values are unique within a pass; reject duplicates. A merged interval retains its source IDs. Order simultaneous events on different channels by channel index. All channels are OFF after a complete pass.
+- `plan_pulse` retains single-target behavior. Batch planning merges both overlapping **and touching** intervals on the same channel before constructing events; an earlier OFF cannot truncate a longer merged interval.
+- Plan the whole batch before execution. Every occurrence of a repeated `target_id` is rejected. A merged interval retains all contributing IDs uniquely in lexicographic order. Order events by `(event_time_us, nozzle_index)`. All channels are OFF after a complete pass.
+- `VirtualExecutor` owns one immutable schedule, a `next_event_` cursor, and a separate executed-event log. Its single-`Pulse` constructor delegates to the same schedule execution path.
+- Executor precondition: an unchanged successful `Pulse`, an unchanged successful `BatchPlan::schedule`, or an equivalent complete valid schedule. Events have nonnegative times, channels in `[0,8)`, and are ordered by time/channel. Per channel they strictly alternate ON/OFF, begin ON, end OFF, and describe positive half-open intervals separated by positive gaps. Empty schedules are valid. Arbitrary malformed schedules are not validated. Construction starts at time zero, all OFF, with no events emitted.
 
 ## Error handling
 
@@ -89,11 +94,12 @@ If `on_time_us < now_us`, return `TOO_LATE`. Do not backdate the command or repl
 | Negative timestamp or a frame from the future | `INVALID_TIMESTAMP`; no events |
 | A calculated time or index cannot be represented correctly | `TIME_OUT_OF_RANGE` for time, `INVALID_TARGET` for an index; no events |
 | The ON command is already late | `TOO_LATE`; no events |
+| Repeated ID anywhere in the batch | Every occurrence receives `DUPLICATE_TARGET_ID`, before individual validation |
 | Virtual time moves backward | `CLOCK_REWIND`; preserve state and log |
 
-Validation order: configuration → timestamps → coordinate finiteness → swath bounds → forward distance → arithmetic representability → lateness.
+Single-target validation order (unchanged): configuration → timestamps → coordinate finiteness → swath bounds → forward distance → arithmetic representability → lateness.
 
-In a future batch, reject an invalid target independently without removing valid commands for other targets. An empty batch is valid and produces no events. At later stages, an image/model loading failure stops the pass before planning; this differs from a valid result with zero detections.
+In a batch, reject an invalid target independently without removing valid commands for other targets. Empty input is valid only after shared configuration/time validation succeeds and then produces no events. At later stages, an image/model loading failure stops the pass before planning; this differs from a valid result with zero detections.
 
 ## M1.1: one target, one pulse
 
@@ -106,19 +112,19 @@ Implemented M1.1 files:
 | `CMakeLists.txt` | One controller library target, a demo executable, a test executable, and CTest |
 | `src/controller.hpp` | Simple structures, result type, and function declarations |
 | `src/controller.cpp` | Validation, pulse calculation, and minimal virtual execution |
-| `src/main.cpp` | One fixed synthetic target and printed output |
+| `src/main.cpp` | One fixed synthetic batch and printed output (updated in M1.2) |
 | `tests/controller_tests.cpp` | Numerical reference, boundaries, rejections, and time-dependent states |
 
 No external test framework, JSON parser, CLI configurator, or separate clock/executor hierarchy is needed. The test executable returns a nonzero code on failure; checks must remain active under `NDEBUG`.
 
-Reference input: `pitch = 0.25 m`, `x = 0.625 m`, `forward = 1.0 m`, `speed = 2.0 m/s`, `capture = 1_000_000 us`, `now = 1_100_000 us`, `delay = 50_000 us`, `pulse = 100_000 us`. Expected: channel `2`, arrival `1_500_000 us`, ON `1_450_000 us`, OFF `1_550_000 us`. See the [walkthrough](LEARNING.md).
+Reference input: `pitch = 0.25 m`, `x = 0.625 m`, `forward = 1.0 m`, `speed = 2.0 m/s`, `capture = 1_000_000 us`, `now = 1_100_000 us`, `delay = 50_000 us`, `pulse = 100_000 us`. Expected: channel `2`, arrival `1_500_000 us`, ON `1_450_000 us`, OFF `1_550_000 us`. The reference remains in regression tests; see the [controller notes](LEARNING.md).
 
-M1.1 acceptance criteria (**verified in Debug and Release: 1 CTest test with 20 named scenarios in each configuration; repeated demo output matched the reference**):
+M1.1 acceptance criteria (**all original 20 scenarios retained unchanged and passing within the current 40-scenario Debug/Release/UBSan runs; the original single-target demo reference is retained in regression tests**):
 
 | Check | Expected result |
 |---|---|
 | Build and run demo/CTest in the selected environment | Recorded commands and versions; successful exit codes |
-| Reference input above | Exactly ON/OFF for channel 2 at the specified timestamps; identical output on a repeated run |
+| Reference input above | Exactly ON/OFF for channel 2 at the specified timestamps; retained in `reference_plan` and `batch_singleton` |
 | `x = 0`, `0.25`, `0.625`, `1.999`, `2.0`, negative x | Channels `0`, `1`, `2`, `7`, followed by two `OUT_OF_SWATH` rejections |
 | Adjacent representable `double` values to the left/right of `0.25` | Channels `0`/`1`; no artificial epsilon |
 | `forward = 1`, `speed = 3` | `travel_time_us = 333_334`, verifying upward rounding |
@@ -132,13 +138,35 @@ M1.1 acceptance criteria (**verified in Debug and Release: 1 CTest test with 20 
 | Advance directly to `1_600_000 us` | Both events logged with their original timestamps |
 | Repeat a time / rewind time | No duplicate events / `CLOCK_REWIND` without mutation |
 
-The remaining M1 slice, M1.2, covers one batch, empty input, ID uniqueness, interval merging, and independent channels. Required same-channel merge cases, in microseconds:
+## M1.2: complete batch and merged schedule
 
-- `[100,200)` and `[150,250)` → `[100,250)`.
-- `[100,200)` and `[200,300)` → `[100,300)`.
-- `[100,200)` and `[201,300)` remain separate intervals.
+Shared validation happens even for empty input: validate one `Config` first, then the shared `now_us`. Invalid configuration returns batch-level `INVALID_CONFIG`; negative `now_us` returns batch-level `INVALID_TIMESTAMP`. `BatchResult` is a variant of `BatchPlan` and `BatchFailure`, so shared failure has neither target results nor an executable schedule.
 
-Completing M1 requires these checks; M1.1 alone is not the whole milestone.
+After shared validation, count IDs across the entire input before calculating any target. Every occurrence of a repeated ID receives `DUPLICATE_TARGET_ID`, including otherwise invalid members of that group. A first occurrence is never accepted or reserved after successful calculation. Different IDs with identical geometry remain distinct accepted targets. Unique-ID targets use `plan_pulse` with its unchanged validation order and arithmetic.
+
+Keep `target_results` in input order, retaining original accepted pulses and per-target rejections. Copy accepted command intervals, sort by channel/ON/OFF, and merge linearly when the next ON is `<=` the current OFF on the same channel. Extend OFF with `max`; retain even a one-microsecond positive gap. Timestamp comparisons use integers directly, without epsilon, `+1`, or subtraction. Store every contributing ID uniquely in lexicographic order.
+
+`merge_intervals` accepts a copied vector of valid intervals: channel in `[0,8)`, `0 <= ON < OFF`, and a nonempty source-ID list. It returns canonical channel/ON order. `make_schedule` requires valid intervals already merged within each channel and prepares all ON/OFF events before execution. Touching same-channel OFF/ON pairs therefore disappear. Inputs are not mutated, and unique-ID input permutations produce identical merged intervals, schedules, and executed logs.
+
+Verified acceptance criteria: Debug and Release configure/build/demo/CTest succeeded; each configuration ran 1 CTest test containing 40 passing scenarios (20 retained M1.1 + 20 M1.2). Repeated demo output matched an independent literal reference. UBSan/float-cast-overflow passed all 40 scenarios with no diagnostics. A deliberately incorrect local expectation under `NDEBUG` exited 1, confirming checks remain active.
+
+| Criterion | Verified expectation / test |
+|---|---|
+| Empty input/executor; shared configuration/time precedence | `batch_empty`, `batch_shared_errors`; shared failures contain no schedule |
+| Singleton regression and original pulses | `batch_singleton`; original arrival/ON/OFF retained |
+| Mixed valid/invalid targets, TOO_LATE, overflow and validation order | `batch_mixed_rejections`, `batch_unique_validation_order`, `batch_time_limits` |
+| All repeated IDs rejected; invalid duplicate member; distinct IDs with identical geometry | `batch_duplicate_ids`, `batch_identical_geometry` |
+| `[100,200)` + `[150,250)` → `[100,250)` | `merge_overlap` |
+| `[100,200)` + `[200,300)` → `[100,300)` | `merge_touch`; no event at the touching boundary |
+| `[100,200)` + `[201,300)` remain separate | `merge_one_microsecond_gap`; OFF at 200, ON at 201 |
+| Identical, nested, transitive and unsorted intervals; complete sorted unique source IDs | `merge_identical_and_nested`, `merge_transitive_unsorted` |
+| Independent channels and simultaneous ON/OFF ordering | `merge_channel_independence`, `schedule_cross_channel_ties` |
+| One large advance vs incremental; repeated time; rewind without clock/state/log mutation | `batch_advance_repeat_rewind` |
+| Timestamp limits, including OFF at INT64_MAX and a one-microsecond gap near it | `merge_timestamp_limits`, `batch_time_limits` |
+| All 120 input permutations; caller input unchanged; planning has no execution side effects | `batch_input_permutations`, `batch_planning_purity` |
+| One deterministic batch demo; final eight channels OFF | `batch_demo_reference` and repeated Debug/Release demo runs |
+
+M1 is complete for the specified virtual command model. No streaming insertion, cancellation, mutable schedules, tracking, multiple-frame handling, threads, OS clocks, hardware, or M2 implementation is included.
 
 ## Later milestones and acceptance criteria
 
