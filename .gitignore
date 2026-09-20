@@ -4,3 +4,13 @@
 /cmake-build-*/
 /CMakeUserPresets.json
 /.local/
+
+# Local Python environment and generated data artifacts.
+/.venv/
+__pycache__/
+*.pyc
+/datasets/
+/data/
+/reports/
+/previews/
+/annotations/
