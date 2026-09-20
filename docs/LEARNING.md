@@ -1,53 +1,82 @@
 # Controller walkthrough
 
-This walkthrough explains the proposed planner and virtual execution model. The numbers are reference expectations, not output from an implemented controller. The full contract is in the [project specification](PROJECT.md).
+This walkthrough follows the implemented single-target controller. The complete contract is in the [project specification](PROJECT.md); build/run commands are in the [README](../README.md).
 
-## From a target to a pulse
+## Inputs and pure planning
 
-The planner answers two questions: which channel covers a target, and when should ON/OFF commands be sent? It does not depend on whether the target came from a synthetic example or a neural network. Geometry and timing can therefore be checked before selecting a dataset.
+[src/main.cpp](../src/main.cpp) supplies one `Target`, one `Config`, and the time when the target becomes available. These simple records are declared in [controller.hpp](../src/controller.hpp).
 
-Consider a 2 m swath divided into eight zones of 0.25 m. Looking forward along the machine's direction of travel, the target is at `x = 0.625 m` from the left edge and `forward = 1.0 m` ahead of the nozzle bar at capture time. Machine speed is `2.0 m/s`.
-
-| Quantity | Value |
+| Input | Reference value |
 |---|---|
-| `capture_time_us` | `1_000_000` (1.000 s) |
-| `now_us` | `1_100_000` (1.100 s) |
-| `actuator_delay_us` | `50_000` (0.050 s) |
-| `pulse_duration_us` | `100_000` (0.100 s) |
+| `target_id` | `synthetic-1` |
+| `capture_time_us` | `1_000_000` |
+| `x_m`, `forward_m` | `0.625 m`, `1.0 m` |
+| `nozzle_pitch_m`, `speed_mps` | `0.25 m`, `2.0 m/s` |
+| `actuator_delay_us`, `pulse_duration_us` | `50_000 us`, `100_000 us` |
+| `now_us` | `1_100_000` |
 
-Calculation:
+`plan_pulse` in [controller.cpp](../src/controller.cpp) receives these values explicitly and changes no inputs or execution state. `PlanResult` is a `std::variant<Pulse, Rejection>`: it contains one complete pulse or a rejection with the target ID and reason, never a partial plan. `reason_name` gives the printable rejection name.
 
-1. `floor(0.625 / 0.25) = 2`: select the third nozzle, **index 2**, covering `[0.50, 0.75)` m.
-2. `1.0 / 2.0 = 0.5 s`: travel time from the captured target position to the nozzle bar.
-3. `1.000 + 0.500 = 1.500 s`: expected arrival. Add travel time to capture time because the distance was measured then.
-4. `1.500 - 0.050 = 1.450 s`: send ON early enough to account for the channel's fixed delay.
-5. `1.450 + 0.100 = 1.550 s`: send OFF after the configured pulse duration.
-6. The current time is `1.100 s`; ON is still in the future, so the target is accepted.
+Validation follows this order:
 
-Expected command log:
+1. Configuration: finite positive pitch and speed, finite total swath width, nonnegative delay, positive duration.
+2. Timestamps: nonnegative capture/current time, with capture no later than now.
+3. Finite target coordinates.
+4. Swath bounds: `0 <= x_m < 8 * nozzle_pitch_m`.
+5. Nonnegative forward distance.
+6. Representable channel index and calculated times.
+7. Lateness: reject only when `on_time_us < now_us`.
 
-```text
-event_time_us  nozzle_index  command
-1450000        2             ON
-1550000        2             OFF
-```
+For the reference, all validation stages succeed:
 
-All channels are OFF before 1.450 s. Only channel 2 is ON during `[1.450, 1.550)` s; all channels are OFF from 1.550 s onward.
+1. `floor(0.625 / 0.25) = 2`: choose channel 2, covering `[0.50, 0.75)` m.
+2. `ceil(1_000_000 * 1.0 / 2.0) = 500_000 us`: travel duration.
+3. `1_000_000 + 500_000 = 1_500_000 us`: arrival.
+4. `1_500_000 - 50_000 = 1_450_000 us`: ON.
+5. `1_450_000 + 100_000 = 1_550_000 us`: OFF.
+6. ON is later than `now_us = 1_100_000`, so the result is accepted.
 
-With the same fixed delay for switching on and off, the assumed effective pulse occupies `[1.500, 1.600)` s. The target arrives at the bar at the start of that interval. The command log does not establish where fluid would land; spray physics is not modeled.
+Arrival is based on **capture time** because `forward_m` measures distance from the nozzle bar at capture. Using processing time would add the elapsed `100_000 us` again. There is no separate inference-time subtraction or arbitrary frame-age timeout.
 
-## Absolute time and boundary cases
+The planner widens the travel calculation to `long double` before multiplication, rounds upward with `ceil`, and checks finiteness and the exclusive limit `2^63` before converting to `int64_t`. That bound avoids a potentially rounded floating representation of `INT64_MAX`. Arrival and OFF additions have explicit overflow guards. ON subtraction is safe because both operands are between zero and `INT64_MAX`. A missed negative ON is rejected as `TOO_LATE`; no epsilon or clamping repairs it.
 
-Do not subtract the processing delay `now - capture = 0.100 s` a second time: the absolute timestamps already account for it.
+For `forward_m = 1` and `speed_mps = 3`, travel rounds to `333_334 us`. At `x_m = 0.25`, the right-hand channel is 1; `x_m = 2.0` is outside the swath. Tests include the adjacent representable values around `0.25`.
 
-If the same target becomes available at `now = 1.450001 s`, ON is late by 1 us: return `TOO_LATE` and emit no events. At `now = 1.450000 s`, ON is allowed immediately. No epsilon is used for integer time comparisons.
+## Mutable virtual execution
 
-Travel time is rounded upward to whole microseconds. For `forward = 1 m` and `speed = 3 m/s`, `ceil(1_000_000 / 3) = 333_334 us`.
+The successful `Pulse` is passed to `VirtualExecutor`. Its constructor expects an unchanged result of `plan_pulse`; arbitrary hand-written pulses are outside that API precondition. The planner does not execute anything, and the constructor does not emit events.
 
-## Virtual execution
+The executor retains only:
 
-Virtual time is a value advanced explicitly by the test. Advancing directly to 1.600 s must record both events with their original timestamps. No `sleep` is needed, and the test does not depend on machine load. Repeating the same time produces no duplicates; rewinding time is rejected.
+- the single pulse;
+- virtual `now_us_`, initially zero;
+- eight `states_`, initially OFF;
+- `next_event_`, identifying the next unexecuted ON or OFF;
+- `events_`, the event log.
 
-`Target` and `Pulse` are simple records, similar to Python dataclasses. The planner receives inputs explicitly and returns either a pulse or a rejection reason. Only event execution and virtual-clock position require state. In C++, check `double` finiteness, time-conversion bounds, and `int64_t` overflow.
+`advance_to(t)` first rejects `t < now_us_` with `CLOCK_REWIND`, before changing anything. Otherwise it processes each pending event with its original time `<= t`, updates the corresponding command state, appends the event, and finally updates the clock. Accessors expose the clock, states, and log without allowing mutation.
 
-Multiple same-channel pulses require interval merging before execution: separate ON/OFF pairs can let an earlier OFF truncate a longer overlapping pulse. M1.2 adds overlapping and touching interval handling; M1.1 covers one target only.
+The reference state transitions are:
+
+| Virtual time (us) | Channel 2 | Other seven channels | Logged events |
+|---|---|---|---|
+| `1_449_999` | OFF | OFF | None |
+| `1_450_000` | ON | OFF | ON at `1_450_000` |
+| `1_549_999` | ON | OFF | Unchanged |
+| `1_550_000` | OFF | OFF | Also OFF at `1_550_000` |
+
+Thus the command interval is half-open: `[1_450_000, 1_550_000)`.
+
+The demo advances directly to `1_600_000`. The loop first processes ON at `1_450_000`, then OFF at `1_550_000`. Both timestamps survive in `event_log()` even though the requested time skipped over the whole pulse. All eight values in `channel_states()` finish OFF. Repeating a time creates no duplicate events; rewinding preserves the clock, states, log, and pending execution position.
+
+With the same fixed delay for switching ON and OFF, the assumed effective interval is `[1_500_000, 1_600_000)`. Arrival is at its start. This shifted interval is a modeling assumption, not a second command interval or a claim about where fluid lands.
+
+## Test evidence and boundary of this slice
+
+[controller_tests.cpp](../tests/controller_tests.cpp) has 20 named scenarios inside one CTest executable. `reference_plan` uses independent literal expectations. `half_open_states`, `skip_events`, `repeat_time`, and `rewind_time` check mutable execution. Other cases check rounding, spatial boundaries, invalid inputs, overflow, validation precedence, and planning independence.
+
+The `require` helper throws on failure; the runner reports the failing scenario and returns a nonzero exit code. It does not use `assert`, so Release builds with `NDEBUG` retain the checks.
+
+Pure calculation ends when `plan_pulse` returns its value. Mutable execution begins in `advance_to`: advancing a clock and recording commands are separate from deciding which commands are valid.
+
+This implementation contains no batches or interval merging. Multiple same-channel pulses would require merging overlapping and touching intervals before execution, which belongs to M1.2. Passing M1.1 tests establishes the specified virtual behavior only; it does not validate an entire M1 controller or a physical sprayer.
