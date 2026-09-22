@@ -4,7 +4,9 @@ A portfolio project for Industrial AI / Robotics: detect plants in an image, map
 
 **Implemented:** M1 (M1.1 and M1.2), a C++17 controller that plans one complete synthetic batch before deterministic virtual execution. Each target retains its original pulse or rejection. Overlapping and touching intervals merge within each channel, retaining their source IDs. A complete event schedule drives eight command states and a separate executed-event log.
 
-The planned end-to-end demo processes one image once and simulates one pass over its targets. Image processing is not implemented. The controller has no dependency on a neural network, dataset, Python, or GPU.
+The planned end-to-end demo processes one image once and simulates one pass over its targets. Model inference and Python/C++ integration are not implemented. The controller has no dependency on a neural network, dataset, Python, or GPU.
+
+**M2.1 implemented:** a reproducible PhenoBench annotation audit and crop/weed bbox adapter, with synthetic tests and local ground-truth previews. No model has been trained. Dataset license notices conflict, and train/validation crop IDs overlap; training readiness and the final evaluation protocol remain unresolved. See [data audit and reproduction](docs/DATA.md).
 
 ## Build, test, and run
 
@@ -52,12 +54,13 @@ The demo has fixed inputs and no configurable CLI. The controller library, demo,
 
 - [Project specification](docs/PROJECT.md): scope, coordinates, timing, errors, and acceptance criteria.
 - [Controller notes](docs/LEARNING.md): API behavior and numerical references.
+- [Data audit](docs/DATA.md): measured package facts, provenance, label conventions, split limitations, and Python checks.
 
 | Milestone | Result | Current state |
 |---|---|---|
 | M0 | Scope, assumptions, and acceptance criteria | Documented |
 | M1 | C++ controller with synthetic targets and virtual time | M1.1 and M1.2 implemented and tested |
-| M2 | Python CV baseline on a dataset with verified usage rights | Not started |
+| M2 | Python CV baseline on a dataset with verified usage rights | M2.1 audit/adapter complete; rights and evaluation blockers remain; no training |
 | M3 | ONNX export and C++ inference with consistency checks | Not started |
 | M4 | One end-to-end demo scenario | Not started |
 | M5 | Reproducibility, documentation, and presentation | Not started |
@@ -70,6 +73,6 @@ The current program models commands, not fluid behavior. It uses explicit virtua
 
 The MVP excludes hardware, ROS 2, Kubernetes, cloud infrastructure, Data Loop, a general-purpose framework, and multiple demo scenarios. Video, tracking, and repeated observations of a target are also outside the planned scenario.
 
-Dataset, CV task, model, weights, and inference runtime remain undecided. CropAndWeed and ONNX Runtime are candidates only; see [data and runtime constraints](docs/PROJECT.md#data-runtime). No datasets or models have been downloaded. A license for the project's own code has not been selected.
+The proposed CV task is crop/weed object detection. PhenoBench v1.1.0 was downloaded and audited locally as a candidate; conflicting license notices are unresolved. Model, weights, and inference runtime remain undecided. ONNX Runtime is a candidate only; see [data and runtime constraints](docs/PROJECT.md#data-runtime). No models or pretrained weights have been downloaded. A license for the project's own code has not been selected.
 
 Simulation results do not establish field accuracy, real-time performance, chemical savings, hardware safety, or compliance with an employer's requirements.

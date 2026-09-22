@@ -166,7 +166,13 @@ Verified acceptance criteria: Debug and Release configure/build/demo/CTest succe
 | All 120 input permutations; caller input unchanged; planning has no execution side effects | `batch_input_permutations`, `batch_planning_purity` |
 | One deterministic batch demo; final eight channels OFF | `batch_demo_reference` and repeated Debug/Release demo runs |
 
-M1 is complete for the specified virtual command model. No streaming insertion, cancellation, mutable schedules, tracking, multiple-frame handling, threads, OS clocks, hardware, or M2 implementation is included.
+M1 is complete for the specified virtual command model. The M1 controller includes no streaming insertion, cancellation, mutable schedules, tracking, multiple-frame handling, threads, OS clocks, hardware, or CV integration.
+
+## M2.1: data audit and annotation adapter
+
+Implemented the reproducible PhenoBench v1.1.0 audit and ground-truth crop/weed detection adapter; see [DATA](DATA.md) for measured results, sources, checks, and reproduction. It preserves official train/val membership, raw instance IDs, partial/visibility information, and half-open original-pixel boxes. The proposed later weed bbox center is only a simulation anchor, not a verified stem position.
+
+M2 is not complete: no model was trained, inference performed, controller command generated, or Python/C++ boundary implemented. Conflicting website/archive license notices and observed train/validation crop-ID overlap block a training-readiness claim. Baseline choice, partial-object training treatment, numerical targets, and final evaluation protocol require the next decision. Stop after M2.1; M3/M4 remain unimplemented.
 
 ## Later milestones and acceptance criteria
 
@@ -181,10 +187,10 @@ M1 is complete for the specified virtual command model. No streaming insertion, 
 
 ## Data and runtime: unresolved choices
 
-The [official CropAndWeed license](https://github.com/cropandweed/cropandweed-dataset/blob/main/LICENCE) was reviewed on 2026-09-19. It permits noncommercial use, prohibits commercial use of the data and derivatives, and prohibits redistribution of the dataset or modified versions. It provides limited redistribution permission for abstract derivatives, such as models from which the data cannot be reconstructed. These terms do not establish permission for the intended career portfolio use or image publication. Before selecting the dataset, verify the specific use and display rights; if unclear, use a source with suitable rights or obtain clarification from the rights holder. The dataset has not been selected or downloaded.
+The [official CropAndWeed license](https://github.com/cropandweed/cropandweed-dataset/blob/main/LICENCE) was reviewed on 2026-09-19. It permits noncommercial use, prohibits commercial use of the data and derivatives, and prohibits redistribution of the dataset or modified versions. It provides limited redistribution permission for abstract derivatives, such as models from which the data cannot be reconstructed. These terms do not establish permission for the intended career portfolio use or image publication. Before selecting the dataset, verify the specific use and display rights; if unclear, use a source with suitable rights or obtain clarification from the rights holder. CropAndWeed has not been selected or downloaded. PhenoBench v1.1.0 is now the locally audited candidate; its separate rights conflict is recorded in [DATA](DATA.md).
 
 ONNX Runtime is only a candidate. The main repository's [MIT license](https://github.com/microsoft/onnxruntime/blob/main/LICENSE) does not determine rights to data, weights, or training code. Its [compatibility documentation](https://onnxruntime.ai/docs/reference/compatibility.html) describes runtime/environment and ONNX opset/IR compatibility; no particular combination has been validated for this project. The proposal is to check C++ inference on CPU first and consider acceleration only if evidence justifies it.
 
-Before M2, choose: all plants or weeds; detection or segmentation; the target anchor; dataset/version/license and a permitted example; model and weight provenance; evaluation without leakage between related frames. Before M3, choose runtime/provider, exact versions, preprocessing, and tolerances. These choices remain open.
+M2.1 adopts crop/weed detection and proposes a weed bbox center for later simulation. Before proceeding, resolve dataset/version rights and a permitted example, partial/ignore treatment, model and weight provenance, and evaluation in view of the observed crop-ID overlap. Before M3, choose runtime/provider, exact versions, preprocessing, and tolerances. These choices remain open.
 
 Simulation does not establish field accuracy, real-time performance, chemical savings, hardware safety, or compliance with employer requirements. CV quality, controller arithmetic, and Python/C++ consistency are evaluated separately.
