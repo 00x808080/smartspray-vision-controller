@@ -1,6 +1,6 @@
 # Project specification
 
-This document retains the M0 coordinate/time contract and records the explicit M1.2 batch clarifications. M1.1 and M1.2 are implemented and tested; later milestones have not started. See the [README](../README.md) for implemented capabilities and verified build/run commands.
+This document retains the M0 coordinate/time contract and records the explicit M1.2 batch clarifications. M1.1/M1.2 and the M2.1/M2.2 Python data/detection baseline are implemented and tested; M3 and later milestones have not started. See the [README](../README.md) for implemented capabilities and verified build/run commands.
 
 ## Purpose and scope
 
@@ -172,13 +172,21 @@ M1 is complete for the specified virtual command model. The M1 controller includ
 
 Implemented the reproducible PhenoBench v1.1.0 audit and ground-truth crop/weed detection adapter; see [DATA](DATA.md) for measured results, sources, checks, and reproduction. It preserves official train/val membership, raw instance IDs, partial/visibility information, and half-open original-pixel boxes. The proposed later weed bbox center is only a simulation anchor, not a verified stem position.
 
-M2 is not complete: no model was trained, inference performed, controller command generated, or Python/C++ boundary implemented. Conflicting website/archive license notices and observed train/validation crop-ID overlap block a training-readiness claim. Baseline choice, partial-object training treatment, numerical targets, and final evaluation protocol require the next decision. Stop after M2.1; M3/M4 remain unimplemented.
+## M2.2: one trained crop/weed baseline
+
+The accepted local educational portfolio baseline uses Ultralytics YOLO11n with official COCO-pretrained weights. It preserves official PhenoBench train/val membership and includes all valid annotated appearances, including partial plants and one-pixel visible extents. Classes are crop=0 and weed=1; IDs remain provenance only. No dataset, image derivative or model binary is committed.
+
+The project all-annotated-objects protocol uses native Ultralytics AP50-95, AP50 and AP75, with the checkpoint selected by validation mAP50-95. It does not reproduce the official PhenoBench evaluator. The license discrepancy and 537 shared crop IDs remain facts; the accepted local-use decision does not establish publication/commercial rights or independent unseen-field testing. No numerical AP target or extra training campaign is imposed.
+
+One main experiment is bounded by 50 epochs, early stopping patience 10 and an approximately three-hour training budget. Only conservative HSV changes and flips are used. A label-preserving dataset/trainer hook avoids native identity-perspective small-box filtering. See [BASELINE](BASELINE.md) for measured settings, metrics, provenance, failures and reproduction.
+
+Predictions contain classes, confidence and original-image pixel boxes. No metric-space controller target, controller command, ONNX export or Python/C++ integration is produced. Stop after M2.2; M3/M4 remain unimplemented.
 
 ## Later milestones and acceptance criteria
 
 | Milestone | Completion condition |
 |---|---|
-| M2 | Verify rights for one dataset/version and its artifacts; select task, classes, a split without leakage, metric, and one baseline. Measure held-out performance; retain errors and provenance. Set the numerical target after the data audit and before evaluating the final model |
+| M2 | One local educational crop/weed baseline under the accepted data-use decision; fixed all-annotated-objects protocol, preserved official split and disclosed overlap; measured validation AP, failure examples, provenance and reproducible tests. No independent-field or official-benchmark claim |
 | M3 | Select one runtime/provider and pin versions and ONNX opset/IR. Use identical preprocessing/postprocessing. Compare input tensors, raw outputs, and targets on fixed examples with tolerances specified in advance; show discrepancies that change channels or commands |
 | M4 | One example permitted for demonstration runs from image to the eight-channel log. Expose the illustrative geometry, rejected targets, timing assumptions, and command reasons; all channels finish OFF |
 | M5 | Reproduce the result from a clean environment using verified instructions, declared versions/checksums, tests, sources/licenses, one demo artifact, and explicit limitations |
@@ -187,10 +195,10 @@ M2 is not complete: no model was trained, inference performed, controller comman
 
 ## Data and runtime: unresolved choices
 
-The [official CropAndWeed license](https://github.com/cropandweed/cropandweed-dataset/blob/main/LICENCE) was reviewed on 2026-09-19. It permits noncommercial use, prohibits commercial use of the data and derivatives, and prohibits redistribution of the dataset or modified versions. It provides limited redistribution permission for abstract derivatives, such as models from which the data cannot be reconstructed. These terms do not establish permission for the intended career portfolio use or image publication. Before selecting the dataset, verify the specific use and display rights; if unclear, use a source with suitable rights or obtain clarification from the rights holder. CropAndWeed has not been selected or downloaded. PhenoBench v1.1.0 is now the locally audited candidate; its separate rights conflict is recorded in [DATA](DATA.md).
+The [official CropAndWeed license](https://github.com/cropandweed/cropandweed-dataset/blob/main/LICENCE) was reviewed on 2026-09-19. It permits noncommercial use, prohibits commercial use of the data and derivatives, and prohibits redistribution of the dataset or modified versions. It provides limited redistribution permission for abstract derivatives, such as models from which the data cannot be reconstructed. These terms do not establish permission for the intended career portfolio use or image publication. Before selecting the dataset, verify the specific use and display rights; if unclear, use a source with suitable rights or obtain clarification from the rights holder. CropAndWeed has not been selected or downloaded. PhenoBench v1.1.0 is the selected local educational baseline dataset; its separate rights conflict remains recorded in [DATA](DATA.md).
 
 ONNX Runtime is only a candidate. The main repository's [MIT license](https://github.com/microsoft/onnxruntime/blob/main/LICENSE) does not determine rights to data, weights, or training code. Its [compatibility documentation](https://onnxruntime.ai/docs/reference/compatibility.html) describes runtime/environment and ONNX opset/IR compatibility; no particular combination has been validated for this project. The proposal is to check C++ inference on CPU first and consider acceleration only if evidence justifies it.
 
-M2.1 adopts crop/weed detection and proposes a weed bbox center for later simulation. Before proceeding, resolve dataset/version rights and a permitted example, partial/ignore treatment, model and weight provenance, and evaluation in view of the observed crop-ID overlap. Before M3, choose runtime/provider, exact versions, preprocessing, and tolerances. These choices remain open.
+M2.1 adopts crop/weed detection and proposes a weed bbox center for later simulation. M2.2 fixes partial treatment, YOLO11n/weight provenance and the limited validation protocol under the accepted local-use decision. Dataset publication rights and image display outside local review remain unresolved. Before M3, choose runtime/provider, exact versions, preprocessing and comparison tolerances. The project's own code license remains unselected; this milestone does not invent or change it.
 
 Simulation does not establish field accuracy, real-time performance, chemical savings, hardware safety, or compliance with employer requirements. CV quality, controller arithmetic, and Python/C++ consistency are evaluated separately.
