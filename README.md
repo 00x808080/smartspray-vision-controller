@@ -4,11 +4,13 @@ A portfolio project for Industrial AI / Robotics: detect plants in an image, map
 
 **Implemented:** M1 (M1.1 and M1.2), a C++17 controller that plans one complete synthetic batch before deterministic virtual execution. Each target retains its original pulse or rejection. Overlapping and touching intervals merge within each channel, retaining their source IDs. A complete event schedule drives eight command states and a separate executed-event log.
 
-The planned end-to-end demo processes one image once and simulates one pass over its targets. Python crop/weed inference is implemented in M2.2. Native ONNX CPU inference and a same-controller consistency harness are implemented in M3. The controller has no dependency on a neural network, dataset, Python, or GPU.
+The native end-to-end demo processes one image once and simulates one pass over its targets. Python crop/weed inference is implemented in M2.2. Native ONNX CPU inference and a same-controller consistency harness are implemented in M3. The controller has no dependency on a neural network, dataset, Python, or GPU.
 
 **M2 implemented:** the PhenoBench audit/annotation adapter and one locally trained YOLO11n crop/weed baseline. The baseline uses all valid annotated appearances, including partial plants, and preserves official train/validation membership. It is an educational portfolio experiment with attribution; conflicting dataset license notices and crop-ID overlap remain documented limitations. Fresh-process validation mAP50-95 is **0.6352** (crop **0.8003**, weed **0.4701**). See [model, results and reproduction](docs/BASELINE.md) and [data audit](docs/DATA.md).
 
 **M3 implemented:** fixed FP32 ONNX export and native C++ image inference. On 32 fixed real images plus 6 numerical fixtures, all parity budgets pass; Python/C++ ONNX outputs are bit-exact. All 173 real weed targets produce identical virtual commands. Full validation mAP50-95 is **0.635255** (delta **+0.000063**). See [inference contract, measurements and commands](docs/INFERENCE.md).
+
+**M4 implemented:** `smartspray_vision_demo` composes native inference, the shared M3 mapper, batch planner and `VirtualExecutor`, and writes JSON/CSV/PNG outputs. The frozen training-image demonstration produced **17 predictions, 9 selected weed targets, 0 rejections, 8 merged command intervals and 16 events**, ending with eight channels OFF. Two fresh processes matched numerically and pixel-for-pixel. See [native demo and reproduction](docs/DEMO.md). This is simulation, not physical spraying or evaluation.
 
 ## Build, test, and run
 
@@ -57,6 +59,7 @@ The demo has fixed inputs and no configurable CLI. The controller library, demo,
 - [Project specification](docs/PROJECT.md): scope, coordinates, timing, errors, and acceptance criteria.
 - [Controller notes](docs/LEARNING.md): API behavior and numerical references.
 - [Detection baseline](docs/BASELINE.md): frozen label/evaluation policy, trained YOLO11n, measured results, limitations and verified commands.
+- [Native demo](docs/DEMO.md): paths/configuration, trace records, static visuals and M4 verification.
 - [Native inference](docs/INFERENCE.md): optional C++ build, fixed deployment contract, layered parity, validation regression and CPU timing.
 - [Data audit](docs/DATA.md): measured package facts, provenance, label conventions, split limitations, and Python checks.
 
@@ -65,8 +68,8 @@ The demo has fixed inputs and no configurable CLI. The controller library, demo,
 | M0 | Scope, assumptions, and acceptance criteria | Documented |
 | M1 | C++ controller with synthetic targets and virtual time | M1.1 and M1.2 implemented and tested |
 | M2 | Python crop/weed baseline with explicit data-use and split limitations | M2.1 audit/adapter and M2.2 trained baseline complete |
-| M3 | ONNX export and C++ inference with consistency checks | Implemented and verified; M4 presentation remains separate |
-| M4 | One end-to-end demo scenario | Not started |
+| M3 | ONNX export and C++ inference with consistency checks | Implemented and verified |
+| M4 | One end-to-end demo scenario | Native demo implemented and verified |
 | M5 | Reproducibility, documentation, and presentation | Not started |
 
 `plan_pulse` remains available for single targets. `plan_batch` returns either a `BatchFailure` (invalid shared configuration/time) or a `BatchPlan` with input-ordered results, merged intervals, and a complete schedule. Every occurrence of a repeated ID is rejected. Valid empty input produces an empty schedule.
