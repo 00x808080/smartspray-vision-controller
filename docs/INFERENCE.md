@@ -99,6 +99,8 @@ Controller-only Debug/Release: original **40/40 scenarios** each. Vision Debug/R
 
 The full Python suite passes **88 tests**, including the original 52, 20 reference/matching tests, 6 AP-summary tests, and 10 compiled-CLI tests using tiny synthetic ONNX graphs. The original data environment separately passes 36/36. Unit tests require neither private checkpoint nor full dataset. Compiled-CLI tests explicitly skip without `SMARTSPRAY_INFER`. Input/output alias regression tests preserve image/model/harness inputs, including hard links.
 
+For a fresh checkout and pinned environments, start with [REPRODUCIBILITY](REPRODUCIBILITY.md). The commands below retain the original M3 owner artifact paths and historical export/evaluation route; they are not prerequisites for running the existing ONNX demo.
+
 Executed command forms from the Linux repository root follow. Create new export/manifest/comparison/evaluation outputs; existing evidence is deliberately not overwritten.
 
 ```bash

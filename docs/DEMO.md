@@ -4,25 +4,9 @@
 
 ## Verified invocation and artifacts
 
-Run from the Linux repository root with the existing [M3 dependencies](INFERENCE.md):
+Use the [portable README quickstart](../README.md#quickstart) after provisioning the pinned runtime, verified model and single image as described in [REPRODUCIBILITY](REPRODUCIBILITY.md). All four CLI options are required and accept user-supplied paths; the old owner `.local` layout is not required.
 
-```bash
-cmake -S . -B build-vision-release -DCMAKE_BUILD_TYPE=Release \
-  -DSMARTSPRAY_BUILD_VISION=ON \
-  -DONNXRUNTIME_ROOT="$PWD/.local/m3/deps/onnxruntime-linux-x64-1.22.0" \
-  -DSMARTSPRAY_REAL_MODEL="$PWD/.local/m3/model/detector.onnx" \
-  -DSMARTSPRAY_REAL_IMAGE="$PWD/.local/m2.2/dataset/images/train/05-15_00028_P0030852.png"
-cmake --build build-vision-release --parallel 2
-ctest --test-dir build-vision-release --output-on-failure --no-tests=error --verbose
-
-./build-vision-release/smartspray_vision_demo \
-  --model .local/m3/model/detector.onnx \
-  --image .local/m2.2/dataset/images/train/05-15_00028_P0030852.png \
-  --config configs/demo.json \
-  --output .local/m4/run-a
-```
-
-All four CLI options are required and accept portable paths. Output parent must exist; output directory must not exist (including empty directories/symlinks). Repeat into a fresh folder such as `.local/m4/run-b`. During verification `.local/m4` already held the frozen manifest; create your own parent first.
+Output parent must exist; output directory must not exist (including empty directories/symlinks). Repeat into a fresh folder. The model/image CMake options also register the actual real-model smoke inputs.
 
 | Required artifact | SHA256 |
 |---|---|
@@ -97,4 +81,4 @@ Predictions are not ground truth. Missed weeds, misclassification and imperfect 
 
 Original image/model files are unchanged. Dataset/model binaries, visual derivatives and session records stay outside Git. Existing PhenoBench license discrepancy/split overlap and separate model/runtime/code rights remain in [DATA](DATA.md), [BASELINE](BASELINE.md) and [INFERENCE](INFERENCE.md). Local presentation is not publication authorization.
 
-Stop after M4. M5 clean reproduction/final packaging remains separate.
+M4 evidence is preserved unchanged. M5 fresh-checkout verification and final packaging are recorded in [REPRODUCIBILITY](REPRODUCIBILITY.md).
