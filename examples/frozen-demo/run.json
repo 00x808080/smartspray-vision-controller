@@ -1,0 +1,1111 @@
+{
+  "action": {
+    "anchors": [
+      {
+        "target_id": "t3460",
+        "u_px": 25.8892822265625,
+        "v_px": 227.152587890625,
+        "xyxy": [
+          4.913120269775391,
+          210.35800170898438,
+          46.86544418334961,
+          243.94717407226563
+        ]
+      },
+      {
+        "target_id": "t19899",
+        "u_px": 941.6828002929688,
+        "v_px": 869.1325073242188,
+        "xyxy": [
+          922.7903442382813,
+          844.7313232421875,
+          960.5752563476563,
+          893.53369140625
+        ]
+      },
+      {
+        "target_id": "t17232",
+        "u_px": 255.83792114257813,
+        "v_px": 214.7272186279297,
+        "xyxy": [
+          241.15347290039063,
+          184.28598022460938,
+          270.5223693847656,
+          245.16845703125
+        ]
+      },
+      {
+        "target_id": "t17887",
+        "u_px": 506.4129638671875,
+        "v_px": 386.14813232421875,
+        "xyxy": [
+          482.1165771484375,
+          341.2119140625,
+          530.7093505859375,
+          431.0843505859375
+        ]
+      },
+      {
+        "target_id": "t19028",
+        "u_px": 320.6070861816406,
+        "v_px": 655.8006591796875,
+        "xyxy": [
+          311.8190612792969,
+          613.3013916015625,
+          329.3951110839844,
+          698.2999267578125
+        ]
+      },
+      {
+        "target_id": "t16709",
+        "u_px": 104.61953735351563,
+        "v_px": 80.46300506591797,
+        "xyxy": [
+          78.42681884765625,
+          66.32723999023438,
+          130.812255859375,
+          94.59877014160156
+        ]
+      },
+      {
+        "target_id": "t1542",
+        "u_px": 51.652671813964844,
+        "v_px": 104.35096740722656,
+        "xyxy": [
+          44.82500457763672,
+          93.80726623535156,
+          58.48033905029297,
+          114.89466857910156
+        ]
+      },
+      {
+        "target_id": "t12783",
+        "u_px": 894.23095703125,
+        "v_px": 793.5223388671875,
+        "xyxy": [
+          888.560302734375,
+          784.0576171875,
+          899.901611328125,
+          802.987060546875
+        ]
+      },
+      {
+        "target_id": "t1203",
+        "u_px": 400.7143859863281,
+        "v_px": 77.77981567382813,
+        "xyxy": [
+          378.2108459472656,
+          65.54495239257813,
+          423.2179260253906,
+          90.01467895507813
+        ]
+      }
+    ],
+    "crop_detections_ignored": 8,
+    "executed_events": [
+      {
+        "command": "ON",
+        "event_time_us": 1101238,
+        "nozzle_index": 7
+      },
+      {
+        "command": "ON",
+        "event_time_us": 1175076,
+        "nozzle_index": 6
+      },
+      {
+        "command": "OFF",
+        "event_time_us": 1201238,
+        "nozzle_index": 7
+      },
+      {
+        "command": "OFF",
+        "event_time_us": 1275076,
+        "nozzle_index": 6
+      },
+      {
+        "command": "ON",
+        "event_time_us": 1309570,
+        "nozzle_index": 2
+      },
+      {
+        "command": "OFF",
+        "event_time_us": 1409570,
+        "nozzle_index": 2
+      },
+      {
+        "command": "ON",
+        "event_time_us": 1572903,
+        "nozzle_index": 3
+      },
+      {
+        "command": "OFF",
+        "event_time_us": 1672903,
+        "nozzle_index": 3
+      },
+      {
+        "command": "ON",
+        "event_time_us": 1728172,
+        "nozzle_index": 0
+      },
+      {
+        "command": "ON",
+        "event_time_us": 1740306,
+        "nozzle_index": 1
+      },
+      {
+        "command": "OFF",
+        "event_time_us": 1828172,
+        "nozzle_index": 0
+      },
+      {
+        "command": "OFF",
+        "event_time_us": 1840306,
+        "nozzle_index": 1
+      },
+      {
+        "command": "ON",
+        "event_time_us": 1848095,
+        "nozzle_index": 0
+      },
+      {
+        "command": "ON",
+        "event_time_us": 1874044,
+        "nozzle_index": 3
+      },
+      {
+        "command": "OFF",
+        "event_time_us": 1971423,
+        "nozzle_index": 0
+      },
+      {
+        "command": "OFF",
+        "event_time_us": 1974044,
+        "nozzle_index": 3
+      }
+    ],
+    "final_states": [
+      "OFF",
+      "OFF",
+      "OFF",
+      "OFF",
+      "OFF",
+      "OFF",
+      "OFF",
+      "OFF"
+    ],
+    "final_time_us": 1974044,
+    "merged_intervals": [
+      {
+        "nozzle_index": 0,
+        "off_time_us": 1828172,
+        "on_time_us": 1728172,
+        "source_target_ids": [
+          "t3460"
+        ]
+      },
+      {
+        "nozzle_index": 0,
+        "off_time_us": 1971423,
+        "on_time_us": 1848095,
+        "source_target_ids": [
+          "t1542",
+          "t16709"
+        ]
+      },
+      {
+        "nozzle_index": 1,
+        "off_time_us": 1840306,
+        "on_time_us": 1740306,
+        "source_target_ids": [
+          "t17232"
+        ]
+      },
+      {
+        "nozzle_index": 2,
+        "off_time_us": 1409570,
+        "on_time_us": 1309570,
+        "source_target_ids": [
+          "t19028"
+        ]
+      },
+      {
+        "nozzle_index": 3,
+        "off_time_us": 1672903,
+        "on_time_us": 1572903,
+        "source_target_ids": [
+          "t17887"
+        ]
+      },
+      {
+        "nozzle_index": 3,
+        "off_time_us": 1974044,
+        "on_time_us": 1874044,
+        "source_target_ids": [
+          "t1203"
+        ]
+      },
+      {
+        "nozzle_index": 6,
+        "off_time_us": 1275076,
+        "on_time_us": 1175076,
+        "source_target_ids": [
+          "t12783"
+        ]
+      },
+      {
+        "nozzle_index": 7,
+        "off_time_us": 1201238,
+        "on_time_us": 1101238,
+        "source_target_ids": [
+          "t19899"
+        ]
+      }
+    ],
+    "original_height": 1024.0,
+    "original_width": 1024.0,
+    "schedule": [
+      {
+        "command": "ON",
+        "event_time_us": 1101238,
+        "nozzle_index": 7
+      },
+      {
+        "command": "ON",
+        "event_time_us": 1175076,
+        "nozzle_index": 6
+      },
+      {
+        "command": "OFF",
+        "event_time_us": 1201238,
+        "nozzle_index": 7
+      },
+      {
+        "command": "OFF",
+        "event_time_us": 1275076,
+        "nozzle_index": 6
+      },
+      {
+        "command": "ON",
+        "event_time_us": 1309570,
+        "nozzle_index": 2
+      },
+      {
+        "command": "OFF",
+        "event_time_us": 1409570,
+        "nozzle_index": 2
+      },
+      {
+        "command": "ON",
+        "event_time_us": 1572903,
+        "nozzle_index": 3
+      },
+      {
+        "command": "OFF",
+        "event_time_us": 1672903,
+        "nozzle_index": 3
+      },
+      {
+        "command": "ON",
+        "event_time_us": 1728172,
+        "nozzle_index": 0
+      },
+      {
+        "command": "ON",
+        "event_time_us": 1740306,
+        "nozzle_index": 1
+      },
+      {
+        "command": "OFF",
+        "event_time_us": 1828172,
+        "nozzle_index": 0
+      },
+      {
+        "command": "OFF",
+        "event_time_us": 1840306,
+        "nozzle_index": 1
+      },
+      {
+        "command": "ON",
+        "event_time_us": 1848095,
+        "nozzle_index": 0
+      },
+      {
+        "command": "ON",
+        "event_time_us": 1874044,
+        "nozzle_index": 3
+      },
+      {
+        "command": "OFF",
+        "event_time_us": 1971423,
+        "nozzle_index": 0
+      },
+      {
+        "command": "OFF",
+        "event_time_us": 1974044,
+        "nozzle_index": 3
+      }
+    ],
+    "target_results": [
+      {
+        "arrival_time_us": 1778172,
+        "nozzle_index": 0,
+        "off_time_us": 1828172,
+        "on_time_us": 1728172,
+        "status": "pulse",
+        "target_id": "t3460"
+      },
+      {
+        "arrival_time_us": 1151238,
+        "nozzle_index": 7,
+        "off_time_us": 1201238,
+        "on_time_us": 1101238,
+        "status": "pulse",
+        "target_id": "t19899"
+      },
+      {
+        "arrival_time_us": 1790306,
+        "nozzle_index": 1,
+        "off_time_us": 1840306,
+        "on_time_us": 1740306,
+        "status": "pulse",
+        "target_id": "t17232"
+      },
+      {
+        "arrival_time_us": 1622903,
+        "nozzle_index": 3,
+        "off_time_us": 1672903,
+        "on_time_us": 1572903,
+        "status": "pulse",
+        "target_id": "t17887"
+      },
+      {
+        "arrival_time_us": 1359570,
+        "nozzle_index": 2,
+        "off_time_us": 1409570,
+        "on_time_us": 1309570,
+        "status": "pulse",
+        "target_id": "t19028"
+      },
+      {
+        "arrival_time_us": 1921423,
+        "nozzle_index": 0,
+        "off_time_us": 1971423,
+        "on_time_us": 1871423,
+        "status": "pulse",
+        "target_id": "t16709"
+      },
+      {
+        "arrival_time_us": 1898095,
+        "nozzle_index": 0,
+        "off_time_us": 1948095,
+        "on_time_us": 1848095,
+        "status": "pulse",
+        "target_id": "t1542"
+      },
+      {
+        "arrival_time_us": 1225076,
+        "nozzle_index": 6,
+        "off_time_us": 1275076,
+        "on_time_us": 1175076,
+        "status": "pulse",
+        "target_id": "t12783"
+      },
+      {
+        "arrival_time_us": 1924044,
+        "nozzle_index": 3,
+        "off_time_us": 1974044,
+        "on_time_us": 1874044,
+        "status": "pulse",
+        "target_id": "t1203"
+      }
+    ],
+    "targets": [
+      {
+        "capture_time_us": 1000000,
+        "forward_m": 1.556342601776123,
+        "target_id": "t3460",
+        "x_m": 0.05056500434875488
+      },
+      {
+        "capture_time_us": 1000000,
+        "forward_m": 0.30247557163238525,
+        "target_id": "t19899",
+        "x_m": 1.8392242193222046
+      },
+      {
+        "capture_time_us": 1000000,
+        "forward_m": 1.5806109011173248,
+        "target_id": "t17232",
+        "x_m": 0.4996834397315979
+      },
+      {
+        "capture_time_us": 1000000,
+        "forward_m": 1.2458044290542603,
+        "target_id": "t17887",
+        "x_m": 0.9890878200531006
+      },
+      {
+        "capture_time_us": 1000000,
+        "forward_m": 0.7191393375396729,
+        "target_id": "t19028",
+        "x_m": 0.6261857151985168
+      },
+      {
+        "capture_time_us": 1000000,
+        "forward_m": 1.842845693230629,
+        "target_id": "t16709",
+        "x_m": 0.2043350338935852
+      },
+      {
+        "capture_time_us": 1000000,
+        "forward_m": 1.7961895167827606,
+        "target_id": "t1542",
+        "x_m": 0.10088412463665009
+      },
+      {
+        "capture_time_us": 1000000,
+        "forward_m": 0.4501516819000244,
+        "target_id": "t12783",
+        "x_m": 1.7465448379516602
+      },
+      {
+        "capture_time_us": 1000000,
+        "forward_m": 1.8480862975120544,
+        "target_id": "t1203",
+        "x_m": 0.7826452851295471
+      }
+    ]
+  },
+  "configuration": {
+    "actuator_delay_us": 50000,
+    "capture_time_us": 1000000,
+    "lookahead_m": 2.0,
+    "nozzle_pitch_m": 0.25,
+    "pulse_duration_us": 100000,
+    "schema_version": 1,
+    "simulated_processing_delay_us": 100000,
+    "speed_mps": 2.0
+  },
+  "counts": {
+    "accepted": 9,
+    "crops_not_selected": 8,
+    "detections": 17,
+    "events": 16,
+    "merged_intervals": 8,
+    "rejected": 0,
+    "targets": 9,
+    "weeds_selected": 9
+  },
+  "image": {
+    "filename": "05-15_00028_P0030852.png",
+    "id": "05-15_00028_P0030852",
+    "original_height_px": 1024,
+    "original_width_px": 1024,
+    "sha256": "43aa736cfa133817c93ea33269e7835a274577ef3a35c863c27546aa9e8bd9ba"
+  },
+  "inference": {
+    "class_names": [
+      "crop",
+      "weed"
+    ],
+    "confidence_comparison": ">",
+    "confidence_threshold": 0.25,
+    "geometry": {
+      "bottom": 0,
+      "left": 0,
+      "original_height": 1024,
+      "original_width": 1024,
+      "r": 1.0,
+      "resized_height": 1024,
+      "resized_width": 1024,
+      "right": 0,
+      "top": 0
+    },
+    "maximum_detections": 300,
+    "nms_class_aware": true,
+    "nms_iou_threshold": 0.699999988079071,
+    "ordering": "score descending, graph candidate index ascending; class tie chooses crop",
+    "preprocessing": "M3 BGR decode; centered 1024 letterbox, scale-up, INTER_LINEAR, pad114; RGB FP32 /255 NCHW",
+    "suppression_comparison": ">"
+  },
+  "model": {
+    "dtype": "FP32",
+    "input_name": "images",
+    "input_shape": [
+      1,
+      3,
+      1024,
+      1024
+    ],
+    "output_name": "output0",
+    "output_shape": [
+      1,
+      6,
+      21504
+    ],
+    "sha256": "1897b7c32c91b73665f9faa179739ae85e664530380971f3699c684ef6f82c35"
+  },
+  "runtime": {
+    "execution_mode": "sequential",
+    "graph_optimization": "ORT_ENABLE_ALL",
+    "inter_op_threads": 1,
+    "intra_op_threads": 1,
+    "name": "ONNX Runtime",
+    "opencv_threads": 1,
+    "opencv_version": "4.6.0",
+    "provider": "CPUExecutionProvider",
+    "version": "1.22.0"
+  },
+  "schema_version": 1,
+  "simulation": {
+    "anchor": "predicted_weed_bbox_center_original_pixels_not_verified_stem",
+    "channels": 8,
+    "command_intervals": "half-open [ON, OFF); fixed equal actuator ON/OFF delay",
+    "coordinate_rounding": "none; no camera offset or target clamping",
+    "final_time_rule": "max(now_us, every scheduled OFF); no added tick",
+    "image_domain": "0 <= u_px < width; 0 <= v_px < height; origin top-left",
+    "mapping": {
+      "forward_m": "lookahead_m * (1 - v_px / image_height_px)",
+      "x_m": "swath_width_m * u_px / image_width_px"
+    },
+    "now_us": 1100000,
+    "swath_width_m": 2.0,
+    "time": "integer microseconds from shared virtual origin; not wall-clock or UTC"
+  },
+  "simulation_only": true,
+  "status": "completed",
+  "trace": [
+    {
+      "detection_id": "d20812",
+      "prediction": {
+        "candidate_index": 20812,
+        "class_id": 0,
+        "class_name": "crop",
+        "score": 0.9685667753219604,
+        "xyxy": [
+          362.41827392578125,
+          239.4033203125,
+          450.72686767578125,
+          434.86279296875
+        ]
+      },
+      "reason": "predicted_crop",
+      "selected_for_mapping": false,
+      "status": "not_selected"
+    },
+    {
+      "detection_id": "d21069",
+      "prediction": {
+        "candidate_index": 21069,
+        "class_id": 0,
+        "class_name": "crop",
+        "score": 0.9550904035568237,
+        "xyxy": [
+          330.42236328125,
+          506.43670654296875,
+          503.7998046875,
+          722.5374145507813
+        ]
+      },
+      "reason": "predicted_crop",
+      "selected_for_mapping": false,
+      "status": "not_selected"
+    },
+    {
+      "anchor": {
+        "target_id": "t3460",
+        "u_px": 25.8892822265625,
+        "v_px": 227.152587890625,
+        "xyxy": [
+          4.913120269775391,
+          210.35800170898438,
+          46.86544418334961,
+          243.94717407226563
+        ]
+      },
+      "detection_id": "d3460",
+      "plan": {
+        "arrival_time_us": 1778172,
+        "nozzle_index": 0,
+        "off_time_us": 1828172,
+        "on_time_us": 1728172,
+        "status": "pulse",
+        "target_id": "t3460"
+      },
+      "prediction": {
+        "candidate_index": 3460,
+        "class_id": 1,
+        "class_name": "weed",
+        "score": 0.9432340264320374,
+        "xyxy": [
+          4.913120269775391,
+          210.35800170898438,
+          46.86544418334961,
+          243.94717407226563
+        ]
+      },
+      "selected_for_mapping": true,
+      "status": "accepted",
+      "target": {
+        "capture_time_us": 1000000,
+        "forward_m": 1.556342601776123,
+        "target_id": "t3460",
+        "x_m": 0.05056500434875488
+      },
+      "target_id": "t3460"
+    },
+    {
+      "detection_id": "d16312",
+      "prediction": {
+        "candidate_index": 16312,
+        "class_id": 0,
+        "class_name": "crop",
+        "score": 0.906671404838562,
+        "xyxy": [
+          430.53826904296875,
+          996.464111328125,
+          470.20794677734375,
+          1024.0
+        ]
+      },
+      "reason": "predicted_crop",
+      "selected_for_mapping": false,
+      "status": "not_selected"
+    },
+    {
+      "anchor": {
+        "target_id": "t19899",
+        "u_px": 941.6828002929688,
+        "v_px": 869.1325073242188,
+        "xyxy": [
+          922.7903442382813,
+          844.7313232421875,
+          960.5752563476563,
+          893.53369140625
+        ]
+      },
+      "detection_id": "d19899",
+      "plan": {
+        "arrival_time_us": 1151238,
+        "nozzle_index": 7,
+        "off_time_us": 1201238,
+        "on_time_us": 1101238,
+        "status": "pulse",
+        "target_id": "t19899"
+      },
+      "prediction": {
+        "candidate_index": 19899,
+        "class_id": 1,
+        "class_name": "weed",
+        "score": 0.9045413732528687,
+        "xyxy": [
+          922.7903442382813,
+          844.7313232421875,
+          960.5752563476563,
+          893.53369140625
+        ]
+      },
+      "selected_for_mapping": true,
+      "status": "accepted",
+      "target": {
+        "capture_time_us": 1000000,
+        "forward_m": 0.30247557163238525,
+        "target_id": "t19899",
+        "x_m": 1.8392242193222046
+      },
+      "target_id": "t19899"
+    },
+    {
+      "anchor": {
+        "target_id": "t17232",
+        "u_px": 255.83792114257813,
+        "v_px": 214.7272186279297,
+        "xyxy": [
+          241.15347290039063,
+          184.28598022460938,
+          270.5223693847656,
+          245.16845703125
+        ]
+      },
+      "detection_id": "d17232",
+      "plan": {
+        "arrival_time_us": 1790306,
+        "nozzle_index": 1,
+        "off_time_us": 1840306,
+        "on_time_us": 1740306,
+        "status": "pulse",
+        "target_id": "t17232"
+      },
+      "prediction": {
+        "candidate_index": 17232,
+        "class_id": 1,
+        "class_name": "weed",
+        "score": 0.8953646421432495,
+        "xyxy": [
+          241.15347290039063,
+          184.28598022460938,
+          270.5223693847656,
+          245.16845703125
+        ]
+      },
+      "selected_for_mapping": true,
+      "status": "accepted",
+      "target": {
+        "capture_time_us": 1000000,
+        "forward_m": 1.5806109011173248,
+        "target_id": "t17232",
+        "x_m": 0.4996834397315979
+      },
+      "target_id": "t17232"
+    },
+    {
+      "anchor": {
+        "target_id": "t17887",
+        "u_px": 506.4129638671875,
+        "v_px": 386.14813232421875,
+        "xyxy": [
+          482.1165771484375,
+          341.2119140625,
+          530.7093505859375,
+          431.0843505859375
+        ]
+      },
+      "detection_id": "d17887",
+      "plan": {
+        "arrival_time_us": 1622903,
+        "nozzle_index": 3,
+        "off_time_us": 1672903,
+        "on_time_us": 1572903,
+        "status": "pulse",
+        "target_id": "t17887"
+      },
+      "prediction": {
+        "candidate_index": 17887,
+        "class_id": 1,
+        "class_name": "weed",
+        "score": 0.8613357543945313,
+        "xyxy": [
+          482.1165771484375,
+          341.2119140625,
+          530.7093505859375,
+          431.0843505859375
+        ]
+      },
+      "selected_for_mapping": true,
+      "status": "accepted",
+      "target": {
+        "capture_time_us": 1000000,
+        "forward_m": 1.2458044290542603,
+        "target_id": "t17887",
+        "x_m": 0.9890878200531006
+      },
+      "target_id": "t17887"
+    },
+    {
+      "anchor": {
+        "target_id": "t19028",
+        "u_px": 320.6070861816406,
+        "v_px": 655.8006591796875,
+        "xyxy": [
+          311.8190612792969,
+          613.3013916015625,
+          329.3951110839844,
+          698.2999267578125
+        ]
+      },
+      "detection_id": "d19028",
+      "plan": {
+        "arrival_time_us": 1359570,
+        "nozzle_index": 2,
+        "off_time_us": 1409570,
+        "on_time_us": 1309570,
+        "status": "pulse",
+        "target_id": "t19028"
+      },
+      "prediction": {
+        "candidate_index": 19028,
+        "class_id": 1,
+        "class_name": "weed",
+        "score": 0.8210827708244324,
+        "xyxy": [
+          311.8190612792969,
+          613.3013916015625,
+          329.3951110839844,
+          698.2999267578125
+        ]
+      },
+      "selected_for_mapping": true,
+      "status": "accepted",
+      "target": {
+        "capture_time_us": 1000000,
+        "forward_m": 0.7191393375396729,
+        "target_id": "t19028",
+        "x_m": 0.6261857151985168
+      },
+      "target_id": "t19028"
+    },
+    {
+      "detection_id": "d15103",
+      "prediction": {
+        "candidate_index": 15103,
+        "class_id": 0,
+        "class_name": "crop",
+        "score": 0.8143686056137085,
+        "xyxy": [
+          1012.257568359375,
+          917.8162231445313,
+          1023.9345703125,
+          958.0346069335938
+        ]
+      },
+      "reason": "predicted_crop",
+      "selected_for_mapping": false,
+      "status": "not_selected"
+    },
+    {
+      "anchor": {
+        "target_id": "t16709",
+        "u_px": 104.61953735351563,
+        "v_px": 80.46300506591797,
+        "xyxy": [
+          78.42681884765625,
+          66.32723999023438,
+          130.812255859375,
+          94.59877014160156
+        ]
+      },
+      "detection_id": "d16709",
+      "plan": {
+        "arrival_time_us": 1921423,
+        "nozzle_index": 0,
+        "off_time_us": 1971423,
+        "on_time_us": 1871423,
+        "status": "pulse",
+        "target_id": "t16709"
+      },
+      "prediction": {
+        "candidate_index": 16709,
+        "class_id": 1,
+        "class_name": "weed",
+        "score": 0.8108075261116028,
+        "xyxy": [
+          78.42681884765625,
+          66.32723999023438,
+          130.812255859375,
+          94.59877014160156
+        ]
+      },
+      "selected_for_mapping": true,
+      "status": "accepted",
+      "target": {
+        "capture_time_us": 1000000,
+        "forward_m": 1.842845693230629,
+        "target_id": "t16709",
+        "x_m": 0.2043350338935852
+      },
+      "target_id": "t16709"
+    },
+    {
+      "detection_id": "d6268",
+      "prediction": {
+        "candidate_index": 6268,
+        "class_id": 0,
+        "class_name": "crop",
+        "score": 0.809328556060791,
+        "xyxy": [
+          988.0096435546875,
+          382.5484619140625,
+          1005.088623046875,
+          408.8795166015625
+        ]
+      },
+      "reason": "predicted_crop",
+      "selected_for_mapping": false,
+      "status": "not_selected"
+    },
+    {
+      "anchor": {
+        "target_id": "t1542",
+        "u_px": 51.652671813964844,
+        "v_px": 104.35096740722656,
+        "xyxy": [
+          44.82500457763672,
+          93.80726623535156,
+          58.48033905029297,
+          114.89466857910156
+        ]
+      },
+      "detection_id": "d1542",
+      "plan": {
+        "arrival_time_us": 1898095,
+        "nozzle_index": 0,
+        "off_time_us": 1948095,
+        "on_time_us": 1848095,
+        "status": "pulse",
+        "target_id": "t1542"
+      },
+      "prediction": {
+        "candidate_index": 1542,
+        "class_id": 1,
+        "class_name": "weed",
+        "score": 0.738998293876648,
+        "xyxy": [
+          44.82500457763672,
+          93.80726623535156,
+          58.48033905029297,
+          114.89466857910156
+        ]
+      },
+      "selected_for_mapping": true,
+      "status": "accepted",
+      "target": {
+        "capture_time_us": 1000000,
+        "forward_m": 1.7961895167827606,
+        "target_id": "t1542",
+        "x_m": 0.10088412463665009
+      },
+      "target_id": "t1542"
+    },
+    {
+      "detection_id": "d3834",
+      "prediction": {
+        "candidate_index": 3834,
+        "class_id": 0,
+        "class_name": "crop",
+        "score": 0.7336922883987427,
+        "xyxy": [
+          959.2935791015625,
+          231.06204223632813,
+          991.7840576171875,
+          241.93978881835938
+        ]
+      },
+      "reason": "predicted_crop",
+      "selected_for_mapping": false,
+      "status": "not_selected"
+    },
+    {
+      "anchor": {
+        "target_id": "t12783",
+        "u_px": 894.23095703125,
+        "v_px": 793.5223388671875,
+        "xyxy": [
+          888.560302734375,
+          784.0576171875,
+          899.901611328125,
+          802.987060546875
+        ]
+      },
+      "detection_id": "d12783",
+      "plan": {
+        "arrival_time_us": 1225076,
+        "nozzle_index": 6,
+        "off_time_us": 1275076,
+        "on_time_us": 1175076,
+        "status": "pulse",
+        "target_id": "t12783"
+      },
+      "prediction": {
+        "candidate_index": 12783,
+        "class_id": 1,
+        "class_name": "weed",
+        "score": 0.6844545602798462,
+        "xyxy": [
+          888.560302734375,
+          784.0576171875,
+          899.901611328125,
+          802.987060546875
+        ]
+      },
+      "selected_for_mapping": true,
+      "status": "accepted",
+      "target": {
+        "capture_time_us": 1000000,
+        "forward_m": 0.4501516819000244,
+        "target_id": "t12783",
+        "x_m": 1.7465448379516602
+      },
+      "target_id": "t12783"
+    },
+    {
+      "detection_id": "d1330",
+      "prediction": {
+        "candidate_index": 1330,
+        "class_id": 0,
+        "class_name": "crop",
+        "score": 0.6380147933959961,
+        "xyxy": [
+          378.001220703125,
+          65.8018798828125,
+          422.9971923828125,
+          90.338623046875
+        ]
+      },
+      "reason": "predicted_crop",
+      "selected_for_mapping": false,
+      "status": "not_selected"
+    },
+    {
+      "anchor": {
+        "target_id": "t1203",
+        "u_px": 400.7143859863281,
+        "v_px": 77.77981567382813,
+        "xyxy": [
+          378.2108459472656,
+          65.54495239257813,
+          423.2179260253906,
+          90.01467895507813
+        ]
+      },
+      "detection_id": "d1203",
+      "plan": {
+        "arrival_time_us": 1924044,
+        "nozzle_index": 3,
+        "off_time_us": 1974044,
+        "on_time_us": 1874044,
+        "status": "pulse",
+        "target_id": "t1203"
+      },
+      "prediction": {
+        "candidate_index": 1203,
+        "class_id": 1,
+        "class_name": "weed",
+        "score": 0.4660191535949707,
+        "xyxy": [
+          378.2108459472656,
+          65.54495239257813,
+          423.2179260253906,
+          90.01467895507813
+        ]
+      },
+      "selected_for_mapping": true,
+      "status": "accepted",
+      "target": {
+        "capture_time_us": 1000000,
+        "forward_m": 1.8480862975120544,
+        "target_id": "t1203",
+        "x_m": 0.7826452851295471
+      },
+      "target_id": "t1203"
+    },
+    {
+      "detection_id": "d3963",
+      "prediction": {
+        "candidate_index": 3963,
+        "class_id": 0,
+        "class_name": "crop",
+        "score": 0.2667601704597473,
+        "xyxy": [
+          958.7408447265625,
+          230.77880859375,
+          996.8035888671875,
+          244.50177001953125
+        ]
+      },
+      "reason": "predicted_crop",
+      "selected_for_mapping": false,
+      "status": "not_selected"
+    }
+  ]
+}

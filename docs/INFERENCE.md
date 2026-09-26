@@ -1,6 +1,6 @@
-# Native ONNX inference and consistency (M3)
+# Native ONNX inference and consistency
 
-M3 exports the existing two-class YOLO11n and runs image inference in C++17. The controller source and its 40 scenarios are unchanged. The M3 bridge remains a numerical consistency harness. M4 reuses its extracted helpers in the [native demo](DEMO.md); M3 inference settings and measurements below are unchanged.
+The two-class YOLO11n is exported from Python and executed in C++17 with ONNX Runtime CPU. This document defines the model contract and records the frozen export, numerical comparisons, validation regression and timing experiment (M3). The [native demo](DEMO.md) reuses these components with the independent controller. Later presentation work does not change these measurements.
 
 ## Export and dependencies
 
@@ -101,11 +101,11 @@ The full Python suite passes **88 tests**, including the original 52, 20 referen
 
 For a fresh checkout and pinned environments, start with [REPRODUCIBILITY](REPRODUCIBILITY.md). The commands below retain the original M3 owner artifact paths and historical export/evaluation route; they are not prerequisites for running the existing ONNX demo.
 
-Executed command forms from the Linux repository root follow. Create new export/manifest/comparison/evaluation outputs; existing evidence is deliberately not overwritten.
+Set `UV` to your existing uv executable, as described in REPRODUCIBILITY. Executed command forms from the Linux repository root follow. Create new export/manifest/comparison/evaluation outputs; existing evidence is deliberately not overwritten.
 
 ```bash
-.local/m2.1/uv/uv pip install --python .venv-ml/bin/python --no-deps --only-binary :all: -r requirements-inference.txt --index-url https://pypi.org/simple
-.local/m2.1/uv/uv pip check --python .venv-ml/bin/python
+"$UV" pip install --python .venv-ml/bin/python --no-deps --only-binary :all: -r requirements-inference.txt --index-url https://pypi.org/simple
+"$UV" pip check --python .venv-ml/bin/python
 
 .venv-ml/bin/python tools/onnx_deploy.py --checkpoint .local/m2.2/main/weights/best.pt --output .local/m3/model/detector.onnx
 .venv-ml/bin/python tools/verify_inference.py freeze --derived .local/m2.2/dataset --baseline-examples .local/m2.2/evaluation/inspected-predictions.json --output .local/m3/sample-manifest.json
@@ -126,4 +126,4 @@ The minimal Ubuntu packages are `libopencv-core-dev libopencv-imgproc-dev libope
 
 Sanitizer build used `-fsanitize=address,undefined,float-cast-overflow -fno-omit-frame-pointer` in `CMAKE_CXX_FLAGS` and the sanitizer flags in `CMAKE_EXE_LINKER_FLAGS`; CTest ran with `ASAN_OPTIONS=detect_leaks=1:halt_on_error=1`, `UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1`, excluding the separately reported real-model test.
 
-Local evidence is under `.local/m3`: export metadata, immutable sample manifest, per-layer comparisons and predictions, controller input/output, validation deltas, timing, dependency sources and test logs. Large tensor dumps remain under `.local/m3/parity` and are excluded from the compact review archive along with dataset images and model binaries. Source archives contain tracked source/technical docs only. No retraining, hardware integration or M4 presentation is included.
+Local evidence is under `.local/m3`: export metadata, immutable sample manifest, per-layer comparisons and predictions, controller input/output, validation deltas, timing, dependency sources and test logs. Large tensor dumps remain under `.local/m3/parity` and are excluded from the compact review archive along with dataset images and model binaries. Source archives contain the tracked project content, including the curated command chart and saved numeric example. These are historical inference measurements; the integrated presentation and output semantics are documented in [DEMO](DEMO.md).

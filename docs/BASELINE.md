@@ -1,6 +1,6 @@
-# YOLO11n crop/weed detection baseline (M2.2)
+# YOLO11n crop/weed detection baseline
 
-One local educational portfolio baseline, initialized from official COCO-pretrained YOLO11n weights. The original controller is unchanged. This stage produces detections in original-image pixels; it does not export ONNX, create metric-space targets, invoke C++, or integrate hardware.
+The trained two-class baseline starts from official COCO-pretrained YOLO11n weights. This document covers the offline Python training and detector evaluation; [INFERENCE](INFERENCE.md) covers export and native C++ execution, and [DEMO](DEMO.md) composes detections with the independent controller. Historical experiment identifiers are retained to distinguish evidence.
 
 ## Model, environment and provenance
 
@@ -80,10 +80,10 @@ The native loss curves show falling training losses and plateauing validation AP
 
 For a fresh environment, use the exact, source-separated uv installation in [REPRODUCIBILITY](REPRODUCIBILITY.md#existing-python-suites). It was tested from an empty environment in M5. The historical combined-index command could fail under uv's first-index policy and has been replaced by that procedure. For training commands below, set the environment path explicitly or create the pinned environment at `.venv-ml`; the native demo does not require it.
 
-With the existing original package and M2.1 audit, export to a **new** derived directory. The real-data commands used:
+With the existing original package and M2.1 audit, export to a **new** derived directory. The recorded command sequence follows. Set `DATASET_ROOT` to your extracted PhenoBench directory; the other paths name generated artifacts within the checkout, not supplied workflow notes:
 
 ```bash
-.venv/bin/python tools/yolo_data.py --dataset-root /home/pc/datasets/phenobench-v110/PhenoBench --audit-root .local/m2.1/run-a --output .local/m2.2/dataset
+.venv/bin/python tools/yolo_data.py --dataset-root "$DATASET_ROOT" --audit-root .local/m2.1/run-a --output .local/m2.2/dataset
 mkdir -p .local/m2.2/weights
 curl -fL --retry 2 https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo11n.pt -o .local/m2.2/weights/yolo11n.pt
 sha256sum .local/m2.2/weights/yolo11n.pt
@@ -94,16 +94,16 @@ sha256sum .local/m2.2/weights/yolo11n.pt
 .venv-ml/bin/python tools/evaluate_baseline.py --weights .local/m2.2/main/weights/best.pt --derived .local/m2.2/dataset --output .local/m2.2/evaluation
 ```
 
-Arguments, not hard-coded home paths, select source/audit/output locations. The commands above show the measured local paths. Do not reuse an existing run's output or duplicate a running process. Predictions/evaluation use a new output directory. Test data is synthetic: normal tests download no weights and require neither GPU nor real PhenoBench data.
+Arguments, not hard-coded home paths, select source/audit/output locations. The recorded commands use the project artifact layout with the dataset root supplied by the reader. Do not reuse an existing run's output or duplicate a running process. Predictions/evaluation use a new output directory. Test data is synthetic: normal tests download no weights and require neither GPU nor real PhenoBench data.
 
 Inspection predictions use confidence=0.25, the same 1024 letterbox, class-aware NMS IoU=0.7, max_det=300 and FP32. JSON records original image ID/dimensions and detection class/name/score/xyxy. Ordinary examples are the first two sorted validation IDs per acquisition date, selected before outputs are reviewed. Additional examples maximize observed missed-weed or crop/weed-confusion counts; their post-hoc selection is labelled. The diagnostic uses GT coverage at IoU>=0.5 for selecting examples, not a replacement AP implementation. Local overlays show GT and predictions in separate labelled panels with different colors.
 
 ## Third-party notices
 
-- PhenoBench: attribution to the PhenoBench authors and [dataset/paper](https://www.phenobench.org/dataset.html); the unresolved archive/website license discrepancy is retained in [DATA](DATA.md). No dataset, image derivative or checkpoint is distributed in Git or the source archive.
+- PhenoBench: attribution to the PhenoBench authors and [dataset/paper](https://www.phenobench.org/dataset.html); the unresolved archive/website license discrepancy is retained in [DATA](DATA.md). No original dataset image, annotated field-image derivative or checkpoint is distributed in Git or the source archive. The curated command chart and numeric trace have separate [asset provenance](assets/ATTRIBUTION.md).
 - Ultralytics 8.4.163, official pretrained weights and resulting YOLO models: [AGPL-3.0](https://www.ultralytics.com/license), as declared by the publisher. ultralytics-thop declares AGPL-3.0; ultralytics-platform declares AGPL-3.0-only. Telemetry, sync and hosted integrations are disabled; no cloud account/tracker is used.
 - PyTorch/torchvision: upstream BSD terms plus bundled third-party notices. The installed torch wheel declares Apache-2.0, Apache-2.0 WITH LLVM-exception, BSD-2-Clause, BSD-3-Clause, BSL-1.0 and MIT; torchvision metadata declares BSD.
 - NVIDIA CUDA/cuDNN and other NVIDIA wheel components retain their separate [NVIDIA terms](https://docs.nvidia.com/cuda/eula/index.html).
 - NumPy's installed wheel declares BSD-3-Clause, 0BSD, MIT, Zlib and CC0-1.0; Pillow declares MIT-CMU; OpenCV declares Apache-2.0. Full distribution metadata/license inventory is kept with local run evidence.
 
-The project's own code license is not selected or changed by this milestone. These third-party notices do not establish commercial deployment or redistribution readiness.
+The project's own code license remains unset. These third-party notices do not establish commercial deployment or redistribution readiness.

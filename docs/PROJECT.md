@@ -1,12 +1,12 @@
 # Project specification
 
-This document retains the M0 coordinate/time contract and records the explicit M1.2 batch clarifications. M1.1/M1.2, the M2.1/M2.2 Python data/detection baseline, and M3 native ONNX inference are implemented and tested. M4 native image-to-command demonstration is implemented and verified. M5 fresh-checkout reproduction and handoff are recorded in [REPRODUCIBILITY](REPRODUCIBILITY.md). See the [README](../README.md) for implemented capabilities and verified build/run commands.
+This specification defines the completed single-image MVP: offline Python training/export, native C++ detection, an independent eight-channel controller and virtual execution. Coordinate/time contracts and historical acceptance criteria remain below. [README](../README.md) is the presentation entry point; [REPRODUCIBILITY](REPRODUCIBILITY.md) records the verified build/run environment.
 
 ## Purpose and scope
 
 The objective is one complete vision-to-actuation demo with eight nozzles and an implementation that can be explained and checked. The first controller is independent of ML. There is no verified employer specification for this project.
 
-The scenario processes one image once, then simulates one pass over the resulting targets. M1 uses synthetic coordinates; later CV stages populate the same target contract. Video and overlapping frames are excluded to avoid tracking and duplicate target processing.
+The scenario processes one image once, then simulates one pass over the resulting targets. The controller demo uses synthetic coordinates; native vision populates the same target contract from predicted weed centers. Video and overlapping frames are excluded to avoid tracking and duplicate target processing.
 
 Outside the MVP: hardware, ROS 2, Kubernetes, cloud infrastructure, Data Loop, a general-purpose framework, and multiple demo scenarios. No GUI, networking, execution threads, or hardware adapter are planned. An annotated image and a timeline or log of eight channels are sufficient for the demonstration.
 
@@ -16,12 +16,12 @@ These are logical steps, not a requirement for separate classes, processes, or p
 
 | Component | Input → output | Purpose / milestone |
 |---|---|---|
-| CV baseline; later C++ inference | One image → detections with class, score, and a selected point in pixels | Find candidate plants; M2/M3 |
+| Native C++ inference; offline Python training | One image → detections with class, score and original-pixel boxes | Find candidate plants; M2/M3 |
 | Target selection and coordinate mapping | Detections + specified geometry → `Target` | Separate plant semantics and pixels from controller logic; M2–M4 |
 | Controller planner | Targets + one `Config` + one `now_us` → original results, merged intervals, and schedule, or a shared failure | Select a channel and command times independently of CV; M1 |
 | Virtual execution and event log | Complete schedule + time advancement → ON/OFF events and eight channel states | Check commands deterministically and present the result; M1/M4 |
 
-M1 passes structures directly within one C++ executable. It needs no external interchange format. M2 may use one small JSON file with `schema_version`, units, and targets; define its exact schema when the Python/C++ boundary exists. Network services and a general-purpose serializer are unnecessary.
+The native demo passes detections and targets between components within one executable. The exported `detector.onnx` is the offline-training/runtime boundary; the separate numerical comparison harness uses JSON. No network service is involved. [DEMO](DEMO.md) defines the complete run record.
 
 ## Coordinates and units
 
@@ -32,16 +32,16 @@ M1 passes structures directly within one C++ executable. It needs no external in
 - There are eight equal zones. `nozzle_pitch_m = 0.25` and total width `2.0 m` are illustrative values, not a real device specification.
 - Channel `i` covers `[i * pitch, (i + 1) * pitch)`, for `i = 0..7`. An internal boundary belongs to the channel on its right; `x_m = 2.0` is outside the swath. After bounds checks, compute the index as `floor(x_m / nozzle_pitch_m)`.
 
-In later image processing, the image origin is at the top left, `u_px` increases rightward, and `v_px` increases downward. Specify the target point and original image dimensions explicitly. The controller does not accept pixel coordinates.
+In image processing, the image origin is at the top left, `u_px` increases rightward, and `v_px` increases downward. Specify the target point and original image dimensions explicitly. The controller does not accept pixel coordinates.
 
-For one image, the proposed **mapping into simulation space** is not camera calibration:
+For one image, the implemented **mapping into simulation space** is not camera calibration:
 
 ```text
 x_m       = width_m * u_px / image_width_px
 forward_m = lookahead_m * (1 - v_px / image_height_px)
 ```
 
-The image domain is `0 <= u_px < image_width_px` and `0 <= v_px < image_height_px`. Choose and disclose `lookahead_m` and image orientation for the single demo. Undo resize/letterbox transforms into original image coordinates first. A bounding-box center is not a verified stem location; the anchor depends on the selected CV task.
+The image domain is `0 <= u_px < image_width_px` and `0 <= v_px < image_height_px`. The demo discloses `lookahead_m = 2.0` and the top-left image orientation. Undo resize/letterbox transforms into original image coordinates first. A bounding-box center is not a verified stem location; the anchor depends on the selected CV task.
 
 ## Controller inputs, time, and outputs
 
@@ -99,7 +99,7 @@ If `on_time_us < now_us`, return `TOO_LATE`. Do not backdate the command or repl
 
 Single-target validation order (unchanged): configuration → timestamps → coordinate finiteness → swath bounds → forward distance → arithmetic representability → lateness.
 
-In a batch, reject an invalid target independently without removing valid commands for other targets. Empty input is valid only after shared configuration/time validation succeeds and then produces no events. At later stages, an image/model loading failure stops the pass before planning; this differs from a valid result with zero detections.
+In a batch, reject an invalid target independently without removing valid commands for other targets. Empty input is valid only after shared configuration/time validation succeeds and then produces no events. In the native demo, an image/model loading failure stops the pass before planning; this differs from a valid result with zero detections.
 
 ## M1.1: one target, one pulse
 
@@ -170,11 +170,11 @@ M1 is complete for the specified virtual command model. The M1 controller includ
 
 ## M2.1: data audit and annotation adapter
 
-Implemented the reproducible PhenoBench v1.1.0 audit and ground-truth crop/weed detection adapter; see [DATA](DATA.md) for measured results, sources, checks, and reproduction. It preserves official train/val membership, raw instance IDs, partial/visibility information, and half-open original-pixel boxes. The proposed later weed bbox center is only a simulation anchor, not a verified stem position.
+Implemented the reproducible PhenoBench v1.1.0 audit and ground-truth crop/weed detection adapter; see [DATA](DATA.md) for measured results, sources, checks, and reproduction. It preserves official train/val membership, raw instance IDs, partial/visibility information, and half-open original-pixel boxes. The weed bbox center proposed during the audit and implemented in the demo is only a simulation anchor, not a verified stem position.
 
 ## M2.2: one trained crop/weed baseline
 
-The accepted local educational portfolio baseline uses Ultralytics YOLO11n with official COCO-pretrained weights. It preserves official PhenoBench train/val membership and includes all valid annotated appearances, including partial plants and one-pixel visible extents. Classes are crop=0 and weed=1; IDs remain provenance only. No dataset, image derivative or model binary is committed.
+The accepted local educational portfolio baseline uses Ultralytics YOLO11n with official COCO-pretrained weights. It preserves official PhenoBench train/val membership and includes all valid annotated appearances, including partial plants and one-pixel visible extents. Classes are crop=0 and weed=1; IDs remain provenance only. No original dataset image, annotated field-image derivative or model binary is committed. The curated timeline and saved numeric example are documented in [asset attribution](assets/ATTRIBUTION.md).
 
 The project all-annotated-objects protocol uses native Ultralytics AP50-95, AP50 and AP75, with the checkpoint selected by validation mAP50-95. It does not reproduce the official PhenoBench evaluator. The license discrepancy and 537 shared crop IDs remain facts; the accepted local-use decision does not establish publication/commercial rights or independent unseen-field testing. No numerical AP target or extra training campaign is imposed.
 
@@ -213,12 +213,12 @@ This demonstration is not evaluation, calibration, stem localization, real-time 
 
 <a id="data-runtime"></a>
 
-## Data and runtime: unresolved choices
+## Data, runtime and license status
 
 The [official CropAndWeed license](https://github.com/cropandweed/cropandweed-dataset/blob/main/LICENCE) was reviewed on 2026-09-19. It permits noncommercial use, prohibits commercial use of the data and derivatives, and prohibits redistribution of the dataset or modified versions. It provides limited redistribution permission for abstract derivatives, such as models from which the data cannot be reconstructed. These terms do not establish permission for the intended career portfolio use or image publication. Before selecting the dataset, verify the specific use and display rights; if unclear, use a source with suitable rights or obtain clarification from the rights holder. CropAndWeed has not been selected or downloaded. PhenoBench v1.1.0 is the selected local educational baseline dataset; its separate rights conflict remains recorded in [DATA](DATA.md).
 
 M3 validates ONNX Runtime 1.22.0 CPU with opset 18 / IR 8 in Python and native C++. The runtime's [MIT license](https://github.com/microsoft/onnxruntime/blob/v1.22.0/LICENSE) does not determine rights to data, weights, or training code. Its [compatibility documentation](https://onnxruntime.ai/docs/reference/compatibility.html) describes runtime/environment and ONNX opset/IR compatibility. The exact validated stack, dependency sources and limits are recorded in [INFERENCE](INFERENCE.md); accelerator runtimes are outside M3.
 
-M2.1 adopts crop/weed detection and proposes a weed bbox center for later simulation. M2.2 fixes partial treatment, YOLO11n/weight provenance and the limited validation protocol under the accepted local-use decision. Dataset publication rights and image display outside local review remain unresolved. M3 fixes the CPU runtime/provider, exact versions, preprocessing and comparison tolerances in [INFERENCE](INFERENCE.md). The project's own code license remains unselected; this milestone does not invent or change it.
+The data audit adopted crop/weed detection and proposed the weed bbox center subsequently implemented in the demo. M2.2 fixes partial treatment, YOLO11n/weight provenance and the limited validation protocol under the accepted local-use decision. Dataset publication and distribution of the annotated field-image derivative remain unresolved; [attribution](assets/ATTRIBUTION.md) records the specific withheld asset. M3 fixes the CPU runtime/provider, exact versions, preprocessing and comparison tolerances in [INFERENCE](INFERENCE.md). The project's own code license remains unselected; this milestone does not invent or change it.
 
 Simulation does not establish field accuracy, real-time performance, chemical savings, hardware safety, or compliance with employer requirements. CV quality, controller arithmetic, and Python/C++ consistency are evaluated separately.
