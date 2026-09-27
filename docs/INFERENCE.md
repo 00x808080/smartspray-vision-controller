@@ -1,6 +1,6 @@
 # Native ONNX inference and consistency (M3)
 
-M3 exports the existing two-class YOLO11n and runs image inference in C++17. The controller source and its 40 scenarios are unchanged. The controller bridge is a numerical consistency harness; M4 presentation has not started.
+M3 exports the existing two-class YOLO11n and runs image inference in C++17. The controller source and its 40 scenarios are unchanged. The M3 bridge remains a numerical consistency harness. M4 reuses its extracted helpers in the [native demo](DEMO.md); M3 inference settings and measurements below are unchanged.
 
 ## Export and dependencies
 

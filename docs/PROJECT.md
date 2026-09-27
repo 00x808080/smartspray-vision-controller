@@ -1,6 +1,6 @@
 # Project specification
 
-This document retains the M0 coordinate/time contract and records the explicit M1.2 batch clarifications. M1.1/M1.2, the M2.1/M2.2 Python data/detection baseline, and M3 native ONNX inference are implemented and tested. M4 and later milestones have not started. See the [README](../README.md) for implemented capabilities and verified build/run commands.
+This document retains the M0 coordinate/time contract and records the explicit M1.2 batch clarifications. M1.1/M1.2, the M2.1/M2.2 Python data/detection baseline, and M3 native ONNX inference are implemented and tested. M4 native image-to-command demonstration is implemented and verified; M5 remains separate. See the [README](../README.md) for implemented capabilities and verified build/run commands.
 
 ## Purpose and scope
 
@@ -188,9 +188,21 @@ Implemented optional C++ image inference using ONNX Runtime 1.22.0 CPU, FP32 bat
 
 The frozen 32-real/6-synthetic sample passes all numerical gates. Python/C++ ONNX raw outputs are bit-exact; 173 real weed targets produce identical results through the unchanged batch planner/executor. Synthetic channel, lateness and one-microsecond boundaries expose sensitivity separately. This consistency harness uses the illustrative pixel mapping with width/lookahead 2 m, speed 2 m/s, capture/now 1,000,000/1,100,000 us, delay 50,000 us and duration 100,000 us; it is not camera calibration.
 
-One ONNX evaluation preserves the M2.2 all-annotated-objects protocol on 772 validation images, with mAP50-95 0.635255 versus 0.635192. No retraining or dataset investigation was performed. Stop after M3; M4 presentation and hardware integration remain separate.
+One ONNX evaluation preserves the M2.2 all-annotated-objects protocol on 772 validation images, with mAP50-95 0.635255 versus 0.635192. No retraining or dataset investigation was performed. M3 measurements remain unchanged. M4 composes these components below; hardware remains outside scope.
 
-## Later milestones and acceptance criteria
+## M4: native image-to-command demonstration
+
+`smartspray_vision_demo` accepts explicit model/image/configuration/output paths and preserves M3 inference settings. Shared mapping/execution helpers were extracted from the M3 harness; controller code and semantics are unchanged. The [configuration](../configs/demo.json) exposes the complete M3 profile: pitch 0.25 m, swath 2 m, lookahead 2 m, speed 2 m/s, capture 1,000,000 us, processing delay 100,000 us, actuator delay 50,000 us and pulse 100,000 us. Checked addition derives now=1,100,000 us; wall-clock inference time never changes it.
+
+Original-image floating-point weed boxes yield center anchors without camera offsets, rounding or target clamping. Candidate-derived IDs preserve predictions, individual plans/rejections and merged attribution. Crops are not selected and are not controller failures. The existing executor advances to max(now, every OFF), without an added tick.
+
+The fixed training sample produced 17 predictions (8 crops, 9 weeds), 9 accepted targets, 0 rejections, 8 merged intervals and 16 events. All eight channels finished OFF at 1,974,044 us. No rejection was fabricated. Offline tests cover empty/crops-only/all-rejected results and failures separately.
+
+Outputs are `run.json`, `events.csv`, `annotated.png` and `timeline.png`. Invalid configuration/image/model/inference fails explicitly. Existing output directories are refused; caught write failures remove only the newly created directory. `run.json` is finalized last. Two fresh processes yielded identical JSON/CSV and rendered pixels; both final visuals were inspected. [DEMO](DEMO.md) records the invocation, hashes, tests and limits.
+
+This demonstration is not evaluation, calibration, stem localization, real-time control or proof of avoiding crop damage. M5 clean reproduction/final packaging remains separate.
+
+## Milestones and acceptance criteria
 
 | Milestone | Completion condition |
 |---|---|

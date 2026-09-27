@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "nozzle_pitch_m": 0.25,
+  "speed_mps": 2.0,
+  "actuator_delay_us": 50000,
+  "pulse_duration_us": 100000,
+  "lookahead_m": 2.0,
+  "capture_time_us": 1000000,
+  "simulated_processing_delay_us": 100000
+}
