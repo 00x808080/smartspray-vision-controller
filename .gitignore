@@ -14,3 +14,10 @@ __pycache__/
 /reports/
 /previews/
 /annotations/
+
+# Local ML environments, weights, and generated runs.
+/.venv-ml/
+/runs/
+*.pt
+*.onnx
+*.cache
