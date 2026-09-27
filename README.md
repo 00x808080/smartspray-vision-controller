@@ -17,21 +17,14 @@ Open the [full-resolution timeline](docs/assets/timeline.png) to read its labels
 ```mermaid
 flowchart TD
   subgraph Offline[Offline Python]
-    Data[PhenoBench images and annotations] --> Train[YOLO11n training]
-    Train --> Checkpoint[best.pt]
-    Checkpoint --> Export[ONNX export]
+    Train[Train YOLO11n on PhenoBench] --> Export[best.pt to ONNX export]
   end
-  Export --> Model[detector.onnx]
-  subgraph Native[Native C++ single-image run]
-    Image[Supplied PNG or BMP] --> Infer[OpenCV preprocessing and ONNX Runtime]
-    Model --> Infer
-    Infer --> Select[Predictions and weed-center mapping]
-    Config[configs/demo.json] --> Select
-    Select --> Plan[Batch planner and interval merging]
-    Plan --> Execute[VirtualExecutor]
-    Execute --> Output[run.json and events.csv]
-    Execute --> Render[OpenCV static rendering]
-    Render --> Pictures[annotated.png and timeline.png]
+  Export -->|detector.onnx| Vision
+  subgraph Native[Native C++]
+    Image[Supplied PNG or BMP] --> Vision[OpenCV and ONNX Runtime]
+    Vision --> Control[Weed mapping, batch planning and VirtualExecutor]
+    Config[configs/demo.json] --> Control
+    Control --> Outputs["run.json and events.csv<br/>annotated.png and timeline.png"]
   end
 ```
 
