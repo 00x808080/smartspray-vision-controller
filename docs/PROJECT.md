@@ -1,6 +1,6 @@
 # Project specification
 
-This document retains the M0 coordinate/time contract and records the explicit M1.2 batch clarifications. M1.1/M1.2 and the M2.1/M2.2 Python data/detection baseline are implemented and tested; M3 and later milestones have not started. See the [README](../README.md) for implemented capabilities and verified build/run commands.
+This document retains the M0 coordinate/time contract and records the explicit M1.2 batch clarifications. M1.1/M1.2, the M2.1/M2.2 Python data/detection baseline, and M3 native ONNX inference are implemented and tested. M4 and later milestones have not started. See the [README](../README.md) for implemented capabilities and verified build/run commands.
 
 ## Purpose and scope
 
@@ -180,7 +180,15 @@ The project all-annotated-objects protocol uses native Ultralytics AP50-95, AP50
 
 One main experiment is bounded by 50 epochs, early stopping patience 10 and an approximately three-hour training budget. Only conservative HSV changes and flips are used. A label-preserving dataset/trainer hook avoids native identity-perspective small-box filtering. See [BASELINE](BASELINE.md) for measured settings, metrics, provenance, failures and reproduction.
 
-Predictions contain classes, confidence and original-image pixel boxes. No metric-space controller target, controller command, ONNX export or Python/C++ integration is produced. Stop after M2.2; M3/M4 remain unimplemented.
+Predictions contain classes, confidence and original-image pixel boxes. That M2.2 stage did not produce metric-space controller targets, commands or ONNX integration. Its original reports remain intact. M3 is recorded separately below.
+
+## M3: native CPU inference and consistency
+
+Implemented optional C++ image inference using ONNX Runtime 1.22.0 CPU, FP32 batch 1, fixed 1024 NCHW, raw decoded two-class output and deterministic external NMS. Controller-only builds retain no vision dependencies. The [inference contract and results](INFERENCE.md) define preprocessing, error behavior, numerical budgets, actual comparisons, full validation regression and CPU timing.
+
+The frozen 32-real/6-synthetic sample passes all numerical gates. Python/C++ ONNX raw outputs are bit-exact; 173 real weed targets produce identical results through the unchanged batch planner/executor. Synthetic channel, lateness and one-microsecond boundaries expose sensitivity separately. This consistency harness uses the illustrative pixel mapping with width/lookahead 2 m, speed 2 m/s, capture/now 1,000,000/1,100,000 us, delay 50,000 us and duration 100,000 us; it is not camera calibration.
+
+One ONNX evaluation preserves the M2.2 all-annotated-objects protocol on 772 validation images, with mAP50-95 0.635255 versus 0.635192. No retraining or dataset investigation was performed. Stop after M3; M4 presentation and hardware integration remain separate.
 
 ## Later milestones and acceptance criteria
 
@@ -197,8 +205,8 @@ Predictions contain classes, confidence and original-image pixel boxes. No metri
 
 The [official CropAndWeed license](https://github.com/cropandweed/cropandweed-dataset/blob/main/LICENCE) was reviewed on 2026-09-19. It permits noncommercial use, prohibits commercial use of the data and derivatives, and prohibits redistribution of the dataset or modified versions. It provides limited redistribution permission for abstract derivatives, such as models from which the data cannot be reconstructed. These terms do not establish permission for the intended career portfolio use or image publication. Before selecting the dataset, verify the specific use and display rights; if unclear, use a source with suitable rights or obtain clarification from the rights holder. CropAndWeed has not been selected or downloaded. PhenoBench v1.1.0 is the selected local educational baseline dataset; its separate rights conflict remains recorded in [DATA](DATA.md).
 
-ONNX Runtime is only a candidate. The main repository's [MIT license](https://github.com/microsoft/onnxruntime/blob/main/LICENSE) does not determine rights to data, weights, or training code. Its [compatibility documentation](https://onnxruntime.ai/docs/reference/compatibility.html) describes runtime/environment and ONNX opset/IR compatibility; no particular combination has been validated for this project. The proposal is to check C++ inference on CPU first and consider acceleration only if evidence justifies it.
+M3 validates ONNX Runtime 1.22.0 CPU with opset 18 / IR 8 in Python and native C++. The runtime's [MIT license](https://github.com/microsoft/onnxruntime/blob/v1.22.0/LICENSE) does not determine rights to data, weights, or training code. Its [compatibility documentation](https://onnxruntime.ai/docs/reference/compatibility.html) describes runtime/environment and ONNX opset/IR compatibility. The exact validated stack, dependency sources and limits are recorded in [INFERENCE](INFERENCE.md); accelerator runtimes are outside M3.
 
-M2.1 adopts crop/weed detection and proposes a weed bbox center for later simulation. M2.2 fixes partial treatment, YOLO11n/weight provenance and the limited validation protocol under the accepted local-use decision. Dataset publication rights and image display outside local review remain unresolved. Before M3, choose runtime/provider, exact versions, preprocessing and comparison tolerances. The project's own code license remains unselected; this milestone does not invent or change it.
+M2.1 adopts crop/weed detection and proposes a weed bbox center for later simulation. M2.2 fixes partial treatment, YOLO11n/weight provenance and the limited validation protocol under the accepted local-use decision. Dataset publication rights and image display outside local review remain unresolved. M3 fixes the CPU runtime/provider, exact versions, preprocessing and comparison tolerances in [INFERENCE](INFERENCE.md). The project's own code license remains unselected; this milestone does not invent or change it.
 
 Simulation does not establish field accuracy, real-time performance, chemical savings, hardware safety, or compliance with employer requirements. CV quality, controller arithmetic, and Python/C++ consistency are evaluated separately.

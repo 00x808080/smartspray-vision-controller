@@ -1,0 +1,7 @@
+# Additions to unchanged requirements-ml.txt. Official PyPI CPU runtime.
+onnx==1.18.0
+onnxruntime==1.22.0
+protobuf==6.32.1
+flatbuffers==25.2.10
+coloredlogs==15.0.1
+humanfriendly==10.0
