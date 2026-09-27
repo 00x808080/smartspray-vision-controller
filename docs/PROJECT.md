@@ -1,6 +1,6 @@
 # Project specification
 
-This document retains the M0 coordinate/time contract and records the explicit M1.2 batch clarifications. M1.1/M1.2, the M2.1/M2.2 Python data/detection baseline, and M3 native ONNX inference are implemented and tested. M4 native image-to-command demonstration is implemented and verified; M5 remains separate. See the [README](../README.md) for implemented capabilities and verified build/run commands.
+This document retains the M0 coordinate/time contract and records the explicit M1.2 batch clarifications. M1.1/M1.2, the M2.1/M2.2 Python data/detection baseline, and M3 native ONNX inference are implemented and tested. M4 native image-to-command demonstration is implemented and verified. M5 fresh-checkout reproduction and handoff are recorded in [REPRODUCIBILITY](REPRODUCIBILITY.md). See the [README](../README.md) for implemented capabilities and verified build/run commands.
 
 ## Purpose and scope
 
@@ -200,7 +200,7 @@ The fixed training sample produced 17 predictions (8 crops, 9 weeds), 9 accepted
 
 Outputs are `run.json`, `events.csv`, `annotated.png` and `timeline.png`. Invalid configuration/image/model/inference fails explicitly. Existing output directories are refused; caught write failures remove only the newly created directory. `run.json` is finalized last. Two fresh processes yielded identical JSON/CSV and rendered pixels; both final visuals were inspected. [DEMO](DEMO.md) records the invocation, hashes, tests and limits.
 
-This demonstration is not evaluation, calibration, stem localization, real-time control or proof of avoiding crop damage. M5 clean reproduction/final packaging remains separate.
+This demonstration is not evaluation, calibration, stem localization, real-time control or proof of avoiding crop damage. Fresh-checkout reproduction and handoff are recorded separately in [REPRODUCIBILITY](REPRODUCIBILITY.md).
 
 ## Milestones and acceptance criteria
 
@@ -209,7 +209,7 @@ This demonstration is not evaluation, calibration, stem localization, real-time 
 | M2 | One local educational crop/weed baseline under the accepted data-use decision; fixed all-annotated-objects protocol, preserved official split and disclosed overlap; measured validation AP, failure examples, provenance and reproducible tests. No independent-field or official-benchmark claim |
 | M3 | Select one runtime/provider and pin versions and ONNX opset/IR. Use identical preprocessing/postprocessing. Compare input tensors, raw outputs, and targets on fixed examples with tolerances specified in advance; show discrepancies that change channels or commands |
 | M4 | One example permitted for demonstration runs from image to the eight-channel log. Expose the illustrative geometry, rejected targets, timing assumptions, and command reasons; all channels finish OFF |
-| M5 | Reproduce the result from a clean environment using verified instructions, declared versions/checksums, tests, sources/licenses, one demo artifact, and explicit limitations |
+| M5 | Reproduce from a fresh remote checkout with new builds/Python environments on the existing Ubuntu/WSL host; verified instructions, declared versions/checksums, tests, sources/notices, one local demo artifact and explicit limitations. Not a clean OS or second-machine claim |
 
 <a id="data-runtime"></a>
 

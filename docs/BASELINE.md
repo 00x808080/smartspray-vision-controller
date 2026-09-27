@@ -78,16 +78,7 @@ The native loss curves show falling training losses and plateauing validation AP
 
 ## Reproduction
 
-Run from the Linux repository root. The existing M2.1 audit environment is separate and unchanged. The following install commands were executed; the full pinned install was also checked against the completed environment:
-
-```bash
-.local/m2.1/uv/uv venv --python /usr/bin/python3 --no-python-downloads .venv-ml
-.local/m2.1/uv/uv pip install --python .venv-ml/bin/python --only-binary :all: torch==2.13.0 torchvision==0.28.0 --index-url https://download.pytorch.org/whl/cu126
-.local/m2.1/uv/uv pip install --python .venv-ml/bin/python --only-binary :all: ultralytics==8.4.163 --index-url https://pypi.org/simple
-.local/m2.1/uv/uv pip install --python .venv-ml/bin/python --only-binary :all: --index https://download.pytorch.org/whl/cu126 --default-index https://pypi.org/simple -r requirements-ml.txt
-```
-
-Create the venv only if absent. The final command verifies/installs the exact pins; on the completed environment it reported 60 packages checked and no changes. This is not a second clean-environment installation claim.
+For a fresh environment, use the exact, source-separated uv installation in [REPRODUCIBILITY](REPRODUCIBILITY.md#existing-python-suites). It was tested from an empty environment in M5. The historical combined-index command could fail under uv's first-index policy and has been replaced by that procedure. For training commands below, set the environment path explicitly or create the pinned environment at `.venv-ml`; the native demo does not require it.
 
 With the existing original package and M2.1 audit, export to a **new** derived directory. The real-data commands used:
 

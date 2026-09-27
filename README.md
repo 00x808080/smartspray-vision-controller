@@ -1,85 +1,67 @@
 # SmartSpray Vision Controller
 
-A portfolio project for Industrial AI / Robotics: detect plants in an image, map selected targets to simulation coordinates, and schedule commands for eight virtual spray nozzles.
+An educational vision-to-actuation portfolio demo: one image becomes crop/weed detections, selected weed centers, and commands for eight **virtual** nozzle channels.
 
-**Implemented:** M1 (M1.1 and M1.2), a C++17 controller that plans one complete synthetic batch before deterministic virtual execution. Each target retains its original pulse or rejection. Overlapping and touching intervals merge within each channel, retaining their source IDs. A complete event schedule drives eight command states and a separate executed-event log.
+The native C++17 pipeline decodes the image, runs YOLO11n through ONNX Runtime CPU, maps predicted weed box centers into illustrative coordinates, plans and merges pulses, executes the complete schedule in virtual time, and renders the result. It writes `annotated.png`, `timeline.png`, `run.json` and `events.csv`. No Python, PyTorch, GPU or service is used by the native executable.
 
-The native end-to-end demo processes one image once and simulates one pass over its targets. Python crop/weed inference is implemented in M2.2. Native ONNX CPU inference and a same-controller consistency harness are implemented in M3. The controller has no dependency on a neural network, dataset, Python, or GPU.
+The frozen **training-image showcase** gives 17 predictions: 8 crops not selected and 9 accepted weeds, with 0 rejections, 8 merged intervals and 16 events. All eight channels finish OFF at 1,974,044 us. This demonstrates simulated commands, not detector evaluation or physical spraying.
 
-**M2 implemented:** the PhenoBench audit/annotation adapter and one locally trained YOLO11n crop/weed baseline. The baseline uses all valid annotated appearances, including partial plants, and preserves official train/validation membership. It is an educational portfolio experiment with attribution; conflicting dataset license notices and crop-ID overlap remain documented limitations. Fresh-process validation mAP50-95 is **0.6352** (crop **0.8003**, weed **0.4701**). See [model, results and reproduction](docs/BASELINE.md) and [data audit](docs/DATA.md).
+## Choose a reproduction level
 
-**M3 implemented:** fixed FP32 ONNX export and native C++ image inference. On 32 fixed real images plus 6 numerical fixtures, all parity budgets pass; Python/C++ ONNX outputs are bit-exact. All 173 real weed targets produce identical virtual commands. Full validation mAP50-95 is **0.635255** (delta **+0.000063**). See [inference contract, measurements and commands](docs/INFERENCE.md).
+| Level | What it needs |
+|---|---|
+| A. Controller and offline tests | Controller: C++ toolchain only. Full offline regression suite: declared native libraries and pinned Python test dependencies; no private model or full dataset |
+| B. Native single-image demo | Declared ONNX model, one image, OpenCV and ONNX Runtime CPU; no Python/PyTorch at runtime |
+| C. Training/evaluation | PhenoBench dataset, audit/derived data and pinned ML stack; existing procedures and evidence, not rerun in M5 |
 
-**M4 implemented:** `smartspray_vision_demo` composes native inference, the shared M3 mapper, batch planner and `VirtualExecutor`, and writes JSON/CSV/PNG outputs. The frozen training-image demonstration produced **17 predictions, 9 selected weed targets, 0 rejections, 8 merged command intervals and 16 events**, ending with eight channels OFF. Two fresh processes matched numerically and pixel-for-pixel. See [native demo and reproduction](docs/DEMO.md). This is simulation, not physical spraying or evaluation.
+A source-only clone contains **neither trained weights nor dataset images**. The owner supplies the existing verified ONNX file and showcase image as separate local inputs. Their hashes and the retained training/export route are in [reproduction](docs/REPRODUCIBILITY.md); bit-identical retraining is not promised.
 
-## Build, test, and run
+## Quickstart
 
-Verified on Ubuntu 24.04 under WSL 2 with G++ 13.3.0, CMake/CTest 3.28.3, C++17, and the Unix Makefiles generator. Run from the project root:
+Verified on the existing Ubuntu 24.04 / WSL 2 host, GCC 13.3.0, CMake/CTest 3.28.3 and Unix Makefiles. Start from the repository root. Controller-only:
 
 ```bash
-cmake -S . -B build-debug -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug
-cmake --build build-debug --parallel 2
-ctest --test-dir build-debug --output-on-failure --no-tests=error --verbose
-./build-debug/smartspray_demo
-./build-debug/smartspray_demo
-
 cmake -S . -B build-release -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
 cmake --build build-release --parallel 2
 ctest --test-dir build-release --output-on-failure --no-tests=error --verbose
 ./build-release/smartspray_demo
-./build-release/smartspray_demo
 ```
 
-Both configurations built and passed **1 registered CTest test containing 40 named scenarios**. Checks remain active with `NDEBUG`; the executable returns a nonzero exit code on failure. The original 20 M1.1 scenarios are unchanged. Twenty M1.2 scenarios cover shared failures, duplicate IDs, exact merge boundaries, channel ties, time limits, input preservation, and all 120 permutations of a five-target input. UBSan/float-cast-overflow also passed all 40 scenarios.
+For the real-image demo, first provision the pinned native dependencies and verified model/image using [the reproduction instructions](docs/REPRODUCIBILITY.md). Set absolute paths to your separate inputs, extracted ORT release and a **new** output directory:
 
-Repeated demo runs produced identical output in both configurations:
+```bash
+export ORT_ROOT=/absolute/path/to/onnxruntime-linux-x64-1.22.0
+export MODEL=/absolute/path/to/inputs/detector.onnx
+export IMAGE=/absolute/path/to/inputs/05-15_00028_P0030852.png
+export OUTPUT=/absolute/path/to/outputs/run-a
 
-```text
-plans: target_id nozzle_index arrival_time_us on_time_us off_time_us
-b 2 1625000 1575000 1700000
-a 2 1500000 1450000 1575000
-c 3 1500000 1450000 1575000
-rejected outside OUT_OF_SWATH
-rejected late TOO_LATE
-merged: nozzle_index on_time_us off_time_us source_target_ids
-2 1450000 1700000 a b
-3 1450000 1575000 c
-event_time_us nozzle_index command
-1450000 2 ON
-1450000 3 ON
-1575000 3 OFF
-1700000 2 OFF
-time_us=1800000 channels[0..7]=OFF OFF OFF OFF OFF OFF OFF OFF
+cmake -S . -B build-vision-release -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release \
+  -DSMARTSPRAY_BUILD_VISION=ON -DONNXRUNTIME_ROOT="$ORT_ROOT" \
+  -DSMARTSPRAY_REAL_MODEL="$MODEL" -DSMARTSPRAY_REAL_IMAGE="$IMAGE"
+cmake --build build-vision-release --parallel 2
+ctest --test-dir build-vision-release --output-on-failure --no-tests=error --verbose
+mkdir -p "$(dirname "$OUTPUT")"
+./build-vision-release/smartspray_vision_demo \
+  --model "$MODEL" --image "$IMAGE" --config configs/demo.json --output "$OUTPUT"
 ```
 
-The demo has fixed inputs and no configurable CLI. The controller library, demo, and test executable use only the C++ standard library.
+The output directory itself must not exist. Debug uses a new build directory and `-DCMAKE_BUILD_TYPE=Debug`. The model/image CMake arguments enable the separate real-model smoke; omitting them causes an explicit skip, not a pass.
 
-## Documentation and roadmap
+## Evidence and documentation
 
-- [Project specification](docs/PROJECT.md): scope, coordinates, timing, errors, and acceptance criteria.
-- [Controller notes](docs/LEARNING.md): API behavior and numerical references.
-- [Detection baseline](docs/BASELINE.md): frozen label/evaluation policy, trained YOLO11n, measured results, limitations and verified commands.
-- [Native demo](docs/DEMO.md): paths/configuration, trace records, static visuals and M4 verification.
-- [Native inference](docs/INFERENCE.md): optional C++ build, fixed deployment contract, layered parity, validation regression and CPU timing.
-- [Data audit](docs/DATA.md): measured package facts, provenance, label conventions, split limitations, and Python checks.
+- [Reproduction and M5 handoff](docs/REPRODUCIBILITY.md): versions, external hashes, setup, tests and limits.
+- [Demo](docs/DEMO.md): configuration, output schema, stable IDs and simulated timing.
+- [Inference](docs/INFERENCE.md): fixed ONNX contract, numerical budgets, consistency and measured CPU timing.
+- [Baseline](docs/BASELINE.md): training, validation results and failure examples.
+- [Data](docs/DATA.md): PhenoBench provenance, annotation policy, license discrepancy and split overlap.
+- [Project contract](docs/PROJECT.md) and [controller notes](docs/LEARNING.md): units, boundaries, errors and virtual execution.
 
-| Milestone | Result | Current state |
-|---|---|---|
-| M0 | Scope, assumptions, and acceptance criteria | Documented |
-| M1 | C++ controller with synthetic targets and virtual time | M1.1 and M1.2 implemented and tested |
-| M2 | Python crop/weed baseline with explicit data-use and split limitations | M2.1 audit/adapter and M2.2 trained baseline complete |
-| M3 | ONNX export and C++ inference with consistency checks | Implemented and verified |
-| M4 | One end-to-end demo scenario | Native demo implemented and verified |
-| M5 | Reproducibility, documentation, and presentation | Not started |
+Historical full validation mAP50-95: PyTorch **0.635192**, ONNX **0.635255**, under the project's all-annotated-objects protocol. The fixed M3 comparison found exact Python/C++ ONNX outputs and identical commands for 173 real weed targets. These are separate detector-quality and numerical-consistency measurements; M5 checks fresh-checkout reproduction.
 
-`plan_pulse` remains available for single targets. `plan_batch` returns either a `BatchFailure` (invalid shared configuration/time) or a `BatchPlan` with input-ordered results, merged intervals, and a complete schedule. Every occurrence of a repeated ID is rejected. Valid empty input produces an empty schedule.
+## Limits and rights
 
-## Limitations and open choices
+One image and one simulated pass only: no video, tracking, camera calibration, hardware or real-time control. Predicted box centers are not verified stems. Excluding predicted crops does not establish crop-damage prevention, chemical savings or field safety. No employer approval or independent-field generalization is claimed.
 
-The current program models commands, not fluid behavior. It uses explicit virtual time, no operating-system clock, execution threads, sleeping, or hardware. A `VirtualExecutor` accepts an unchanged successful pulse or a complete valid event schedule. Its explicit preconditions are in [controller.hpp](src/controller.hpp); arbitrary malformed schedules are not validated. Construction owns an immutable schedule and leaves time at zero with all channels OFF until advancement.
+PhenoBench license notices conflict and 537 crop IDs overlap train/validation; the accepted scenario is local educational use with attribution. Ultralytics code/weights carry AGPL-3.0 terms; dependencies retain separate upstream notices. The project's own code license remains unselected. Dataset/model binaries and presentation images stay outside Git; public distribution is a separate decision.
 
-The MVP excludes hardware, ROS 2, Kubernetes, cloud infrastructure, Data Loop, a general-purpose framework, and multiple demo scenarios. Video, tracking, and repeated observations of a target are also outside the planned scenario.
-
-The CV task is crop/weed detection with Ultralytics YOLO11n, initialized from official COCO-pretrained weights. PhenoBench v1.1.0 is used locally with attribution under the accepted educational portfolio baseline decision; the license discrepancy remains unresolved. Ultralytics code/weights carry AGPL-3.0 terms. Dataset images, derivatives and checkpoints are excluded from Git. ONNX Runtime 1.22.0 CPU is implemented for M3; see [data and runtime constraints](docs/PROJECT.md#data-runtime). A license for the project's own code has not been selected or changed.
-
-Simulation results do not establish field accuracy, real-time performance, chemical savings, hardware safety, or compliance with an employer's requirements.
+M5 completion is recorded in the reproduction document. Teaching remains deferred; no further implementation milestone is authorized.
