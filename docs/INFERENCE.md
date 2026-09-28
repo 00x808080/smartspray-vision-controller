@@ -34,7 +34,7 @@ Only six pinned packages were added to the existing ML environment, using uv wit
 | Coloredlogs 15.0.1 wheel | `612ee75c546f53e92e70049c9dbfcc18c935a2b9a53b66085ce9ef6a6e5c0934` |
 | Humanfriendly 10.0 wheel | `1697e1a8a8f550fd43c2865cd84542fc175a61dcb779b6fee18cf6b6ccba1477` |
 
-Exact PyPI artifact URLs, installed wheel payload verification, Ubuntu package versions/archive digests and source hashes are retained in the local review bundle. Third-party binaries remain under `.local/m3/deps`, outside Git. The existing dataset and Ultralytics licensing findings in [DATA](DATA.md) and [BASELINE](BASELINE.md) are unchanged; no new redistribution rights or project license are asserted.
+Exact PyPI artifact URLs, installed wheel payload verification, Ubuntu package versions/archive digests and source hashes are retained in the local review bundle. Third-party binaries remain under `.local/m3/deps`, outside Git. The existing dataset discrepancy and Ultralytics notices in [DATA](DATA.md) and [BASELINE](BASELINE.md) remain recorded. See [license scope](../NOTICE.md) and the [v0.1.0 model card](../MODEL_CARD.md) for publication terms and metadata-only packaging changes; computation is unchanged.
 
 ## Image and output contract
 
