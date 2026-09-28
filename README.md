@@ -6,11 +6,15 @@ A portfolio project that detects crops and weeds, runs the trained model nativel
 
 ## A real saved demonstration
 
+[![Predicted crop and weed boxes, scores and selected weed targets on PhenoBench training image 05-15_00028_P0030852, with simulated channel geometry](docs/assets/annotated.png)](docs/assets/annotated.png)
+
+Predictions are not ground truth. This showcase uses a **training image**; geometry and actuation are simulated, with no field-safety, calibration or real-time claim. Image: PhenoBench authors, [CC BY-SA 4.0 and modifications](docs/assets/ATTRIBUTION.md).
+
 [![Eight-channel virtual command timeline: eight merged ON intervals, channels 4 and 5 idle, all channels OFF at 1974044 microseconds](docs/assets/timeline.png)](docs/assets/timeline.png)
 
 This is the unchanged output of the frozen demo using PhenoBench **training image `05-15_00028_P0030852`**. Its 17 boxes are model predictions: 8 predicted crops are not selected; 9 predicted weeds become accepted targets. There are **0 controller rejections, 8 merged intervals and 16 events**, ending with all eight channels OFF at **1,974,044 us**. Timing and geometry are simulated. This illustrative run is separate from the validation benchmark.
 
-Open the [full-resolution timeline](docs/assets/timeline.png) to read its labels, especially on a narrow screen. The [saved trace](examples/frozen-demo/README.md) exposes every score, box, target, plan and event without installation. The annotated field image remains outside Git pending the specific dataset-image distribution decision described in [asset attribution](docs/assets/ATTRIBUTION.md).
+Open the full-resolution [predictions](docs/assets/annotated.png) and [timeline](docs/assets/timeline.png) to read their labels, especially on a narrow screen. The [saved trace](examples/frozen-demo/README.md) exposes every score, box, target, plan and event without installation.
 
 ## How the pipeline works
 
@@ -64,7 +68,7 @@ This project protocol is **not the official PhenoBench leaderboard protocol**. V
 
 ### View the saved result
 
-Read the timeline and [saved JSON/CSV example](examples/frozen-demo/README.md) directly on GitHub. No installation, model download or local workflow files are needed.
+View the predictions and timeline, then read the [saved JSON/CSV example](examples/frozen-demo/README.md) directly on GitHub. No installation, model download or local workflow files are needed.
 
 ### Build the controller and run offline tests
 
@@ -81,7 +85,20 @@ This runs the synthetic controller demo and 40 controller scenarios, without ML 
 
 ### Run the native vision demo
 
-The trained ONNX model and original input images **are not included in a clone**. There is no published project model download. Supply the exact external model identified in [reproduction](docs/REPRODUCIBILITY.md#inputs-and-provenance), an 8-bit three-channel PNG/BMP, the pinned ORT distribution and the declared OpenCV/JSON development libraries. Arbitrary ONNX detectors do not satisfy this model contract.
+Download the version-pinned [v0.1.0 model](https://github.com/00x808080/smartspray-vision-controller/releases/tag/v0.1.0) into a new directory and verify it before use:
+
+```bash
+read -r -p 'New model download directory: ' MODEL_DIR
+mkdir -p "$MODEL_DIR"
+RELEASE_URL=https://github.com/00x808080/smartspray-vision-controller/releases/download/v0.1.0
+curl -fL "$RELEASE_URL/detector.onnx" -o "$MODEL_DIR/detector.onnx"
+curl -fL "$RELEASE_URL/SHA256SUMS.txt" -o "$MODEL_DIR/SHA256SUMS.txt"
+(cd "$MODEL_DIR" && grep '  detector.onnx$' SHA256SUMS.txt | sha256sum --check --strict)
+```
+
+The release also includes modifiable trained weights and a [model card](MODEL_CARD.md). A source-only/controller build needs no model. For native inference, supply your own supported **8-bit, three-channel PNG/BMP**, the pinned ORT distribution and the [declared OpenCV/JSON development libraries](docs/REPRODUCIBILITY.md#tested-host-and-dependencies). Arbitrary ONNX detectors do not satisfy this model contract.
+
+Exact showcase reproduction uses PhenoBench training image `05-15_00028_P0030852.png`, obtained separately from the [official dataset archive](https://www.phenobench.org/dataset.html), with the [documented input hash](docs/REPRODUCIBILITY.md#inputs-and-provenance). `annotated.png` is an output visualization, **not detector input**. Model/download/build paths need no old `.local` layout.
 
 Enter your absolute paths at the prompts; spaces are supported. Choose an output directory that does not yet exist:
 
@@ -122,4 +139,4 @@ Follow the existing [data preparation](docs/DATA.md#reproduction), [training/eva
 
 One image, one virtual pass: no video, tracking, calibrated camera geometry or physical actuation. Predicted box centers are not verified stems; excluding predicted crops does not establish crop protection, chemical savings or hardware safety. This is an independent portfolio project; no employer commission, approval, deployment or evaluation is claimed.
 
-PhenoBench authors and the website/archive license discrepancy are recorded in [attribution](docs/assets/ATTRIBUTION.md). The source-code license remains unset. Ultralytics model/code terms and runtime/dependency notices are separate, as detailed in [third-party notices](docs/BASELINE.md#third-party-notices). No common license is asserted for source code, weights and dataset imagery.
+Project-authored source code: **AGPL-3.0-only**, Copyright (C) 2026 Sergey Gonchar; see [LICENSE](LICENSE) and [license scope](NOTICE.md). The annotated PhenoBench illustration is **CC BY-SA 4.0** under the official dataset-page notice, with [attribution and the recorded archive discrepancy](docs/assets/ATTRIBUTION.md). Models retain [Ultralytics provenance and applicable terms](MODEL_CARD.md); dependencies retain their [own notices](docs/BASELINE.md#third-party-notices).

@@ -1,25 +1,28 @@
 # Reproducibility and verified environment
 
-This verifies a fresh GitHub checkout, fresh native builds and new Python environments on the **existing Ubuntu/WSL host**. It is not a clean OS, second-machine test, public release or promise of bit-identical retraining. The functional scope and M3 numerical budgets are unchanged.
+The v0.1.0 quickstart uses versioned public release artifacts and ordinary explicit paths. The historical verification below used fresh GitHub checkouts, native builds and Python environments on the **existing Ubuntu/WSL host**; it is not a clean OS, second-machine test or promise of bit-identical retraining. The functional scope and numerical budgets are unchanged.
 
 ## Inputs and provenance
 
 | Category | Contents |
 |---|---|
-| Tracked | C++/Python sources, tests, CMake, pinned requirements, configuration, technical documents, curated command chart and saved JSON/CSV example |
-| Required for native demo | Owner-supplied ONNX and one image; official ORT CPU archive; declared Ubuntu libraries |
+| Tracked | C++/Python sources, tests, CMake, pinned requirements, configuration, technical documents, attributed annotated image, command chart and saved JSON/CSV example |
+| Required for native demo | v0.1.0 ONNX release asset and a user-supplied image; official ORT CPU archive; declared Ubuntu libraries |
 | Optional training/evaluation | Original checkpoint, pretrained weights, full PhenoBench train/val, audit/derived labels and ML stack |
 | Generated/historical | Builds, environments, full evidence bundles, other JSON/CSV/PNG outputs and local session records; absent from Git |
 
-Supply the already exported `detector.onnx` and an input image as separate files; no prior workflow notes or evidence tree are required. The exact trained model is currently an externally supplied artifact, with no project release/download link. The frozen demonstration image identity and hash were read from the original manifest. It is the first pre-existing M2.2 smoke training ID, frozen before M4 inference, not a sample selected for favorable predictions.
+Download `detector.onnx` and `SHA256SUMS.txt` from the versioned [v0.1.0 release](https://github.com/00x808080/smartspray-vision-controller/releases/tag/v0.1.0), then supply an input image separately. No prior workflow notes or evidence tree are required. The [model card](../MODEL_CARD.md) distinguishes original hashes from publication copies with private metadata removed. The native model graph and weights are unchanged. The frozen demonstration image identity and hash were read from the original manifest. It is the first pre-existing M2.2 smoke training ID, frozen before M4 inference, not a sample selected for favorable predictions.
 
 | Artifact | SHA256 |
 |---|---|
-| `detector.onnx` | `1897b7c32c91b73665f9faa179739ae85e664530380971f3699c684ef6f82c35` |
+| Public v0.1.0 `detector.onnx` | `13c03f6f8c189f7fd3ef440ec8cc823ac0edaed7390b40ddbaf5d2f683fab348` |
+| Original pre-publication `detector.onnx` (provenance only) | `1897b7c32c91b73665f9faa179739ae85e664530380971f3699c684ef6f82c35` |
 | `05-15_00028_P0030852.png` | `43aa736cfa133817c93ea33269e7835a274577ef3a35c863c27546aa9e8bd9ba` |
 | Tracked `configs/demo.json` | `39256507b0e8cb7c2d8dedb3d8c40e35a623ea6a6185351c3010574f7335328c` |
 | Optional original `best.pt` | `ea861ff9ba54a768dffd62814944d157e50037a67fd268ea65fe0d7773196fd6` |
 | Official `onnxruntime-linux-x64-1.22.0.tgz` | `8344d55f93d5bc5021ce342db50f62079daf39aaafb5d311a451846228be49b3` |
+
+The release-model download must match `SHA256SUMS.txt`, not the original pre-publication hash above. The original input is `PhenoBench/train/images/05-15_00028_P0030852.png` within the official [v1.1.0 archive](https://www.phenobench.org/data/PhenoBench-v110.zip); obtain it through the [dataset page](https://www.phenobench.org/dataset.html) and follow its data terms. The image is not a release asset. `docs/assets/annotated.png` is output and must not be used as inference input.
 
 ORT comes from the [official Microsoft release asset](https://github.com/microsoft/onnxruntime/releases/download/v1.22.0/onnxruntime-linux-x64-1.22.0.tgz). M5 reused that verified distribution archive and extracted it anew outside the checkout; it did not copy an installed runtime/build tree. The graph is FP32, opset 18 / IR 8, input `[1,3,1024,1024]`, output `[1,6,21504]`. The existing [training](BASELINE.md#reproduction) and [export](INFERENCE.md#verification-and-reproduction) route remains available; neither is rerun for the native demo.
 
@@ -40,40 +43,52 @@ The declared system packages were already installed and reused; M5 did not upgra
 
 ## Checkout and native build
 
-Use the owner's existing authentication for the private remote. Choose a new absolute `WORK` directory outside the primary repository and an exact reviewed `REVISION`. Run as an ordinary user. Start a shell without inherited project environment settings:
+The native dependencies above must be installed; no Python environment is needed for this section. Choose a new absolute working directory and supply your own supported image. For an exact comparison, use the original PhenoBench training image identified above. Paths with spaces are supported.
 
 ```bash
-env -i HOME="$HOME" USER="$USER" PATH=/usr/bin:/bin LANG=C.UTF-8 \
-  bash --noprofile --norc
-```
-
-Set `WORK` to a new absolute directory whose parent exists; `REVISION` to the exact reviewed commit; `UV` to the existing uv executable; and `OWNER_MODEL`, `OWNER_IMAGE`, `ORT_ARCHIVE` to the verified local source files. These are user-supplied paths, not repository defaults. `UV` may be any existing executable of the recorded version; no personal installation directory is required.
-
-Authenticate Git for the private repository using your existing credential setup before starting. Authentication is external to the project; no Windows-specific helper is required by these commands. Create a fresh remote clone, not a local clone, shared object store or working-directory copy:
-
-```bash
+read -r -p 'New absolute working directory: ' WORK
+read -r -p 'Original input image file: ' SOURCE_IMAGE
 mkdir "$WORK"
-git clone https://github.com/00x808080/smartspray-vision-controller.git "$WORK/source"
-git -C "$WORK/source" checkout --detach "$REVISION"
+git clone --branch v0.1.0 --depth 1 https://github.com/00x808080/smartspray-vision-controller.git "$WORK/source"
 mkdir -p "$WORK/inputs" "$WORK/deps" "$WORK/outputs" "$WORK/envs"
-cp "$OWNER_MODEL" "$WORK/inputs/detector.onnx"
-cp "$OWNER_IMAGE" "$WORK/inputs/05-15_00028_P0030852.png"
-cp "$ORT_ARCHIVE" "$WORK/deps/onnxruntime-linux-x64-1.22.0.tgz"
-sha256sum "$WORK/inputs/"* "$WORK/deps/onnxruntime-linux-x64-1.22.0.tgz"
+RELEASE_URL=https://github.com/00x808080/smartspray-vision-controller/releases/download/v0.1.0
+curl -fL "$RELEASE_URL/detector.onnx" -o "$WORK/inputs/detector.onnx"
+curl -fL "$RELEASE_URL/SHA256SUMS.txt" -o "$WORK/inputs/SHA256SUMS.txt"
+(cd "$WORK/inputs" && grep '  detector.onnx$' SHA256SUMS.txt | sha256sum --check --strict)
+curl -fL https://github.com/microsoft/onnxruntime/releases/download/v1.22.0/onnxruntime-linux-x64-1.22.0.tgz \
+  -o "$WORK/deps/onnxruntime-linux-x64-1.22.0.tgz"
+printf '%s  %s\n' 8344d55f93d5bc5021ce342db50f62079daf39aaafb5d311a451846228be49b3 \
+  "$WORK/deps/onnxruntime-linux-x64-1.22.0.tgz" | sha256sum --check --strict
 tar -xzf "$WORK/deps/onnxruntime-linux-x64-1.22.0.tgz" -C "$WORK/deps"
 cd "$WORK/source"
-sha256sum configs/demo.json
 export ORT_ROOT="$WORK/deps/onnxruntime-linux-x64-1.22.0"
 export MODEL="$WORK/inputs/detector.onnx"
-export IMAGE="$WORK/inputs/05-15_00028_P0030852.png"
+export IMAGE="$SOURCE_IMAGE"
 export OUTPUT="$WORK/outputs/run-a"
+cmake -S . -B build-vision-release -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release \
+  -DSMARTSPRAY_BUILD_VISION=ON -DONNXRUNTIME_ROOT="$ORT_ROOT" \
+  -DSMARTSPRAY_REAL_MODEL="$MODEL" -DSMARTSPRAY_REAL_IMAGE="$IMAGE"
+cmake --build build-vision-release --parallel 2
+ctest --test-dir build-vision-release --output-on-failure --no-tests=error --verbose
+./build-vision-release/smartspray_vision_demo \
+  --model "$MODEL" --image "$IMAGE" --config configs/demo.json --output "$OUTPUT"
 ```
 
-Require every hash to match the table before running. Use the [README quickstart](../README.md#getting-started) for controller and vision Release builds/tests and the native demo. Repeat Debug into fresh build directories. Repeat the demo from a fresh process with `OUTPUT="$WORK/outputs/run-b"`; never reuse an output directory. Neither native invocation needs an activated Python environment. `ldd build-vision-release/smartspray_vision_demo` must resolve ORT from the declared extracted release and OpenCV from system libraries, never from an old project build. CMake supplies the ORT runtime path; no global library-path setting is required.
+Use a supported 8-bit, three-channel PNG/BMP. To verify the exact reference image, compare its SHA256 with the table; an arbitrary user image produces a different result. No source image is downloaded by these commands.
+
+The [README](../README.md#getting-started) also provides the model-free controller build. Repeat the demo into a **new** output directory; the executable refuses an existing directory. `ldd build-vision-release/smartspray_vision_demo` should resolve ORT from the newly extracted distribution and OpenCV from system libraries. No old build or model path is required.
+
+For exact comparison with the frozen JSON/CSV and two PNG outputs, the release model's metadata change necessarily changes only `run.json`'s model-file SHA256 field. Compare that field to the downloaded model, and compare every remaining deterministic field plus CSV bytes and PNG pixels to the original reference. Keep the original reference unchanged; do not describe the complete `run.json` files as byte-identical.
+
+## Modifiable model and training/export
+
+The same versioned release provides `detector-weights.pt`, architecture/provenance material, `MODEL_CARD.md` and notices. Download only the intended assets and verify their entries in `SHA256SUMS.txt`. The weights are a minimal tensor representation, loaded with `weights_only=True` in the pinned Python environment; see the [model card](../MODEL_CARD.md) for the tested loading command and exact packaging changes. Native inference uses only the ONNX file.
+
+The [training configuration](../configs/yolo11n-baseline.yaml), [data preparation](DATA.md#reproduction), [training instructions](BASELINE.md#reproduction) and [export instructions](INFERENCE.md#verification-and-reproduction) retain the original experiment route. Those historical procedures may create their own artifact directories; native users need no prior `.local` contents. Retraining is optional and is not claimed to reproduce identical weights.
 
 ## Existing Python suites
 
-These environments are for tests, not the native program. The full suite includes actual Ultralytics transforms and a synthetic CPU native-validator check, so it requires the pinned ML stack. Create only these two environments; do not copy site-packages or an installed environment.
+Set `UV` to the absolute path of an existing uv 0.12.17 executable (for example, enter it with `read -r -p 'uv executable: ' UV`). These environments are for tests, not the native program. The full suite includes actual Ultralytics transforms and a synthetic CPU native-validator check, so it requires the pinned ML stack. Create only these two environments; do not copy site-packages or an installed environment.
 
 ```bash
 "$UV" venv --python /usr/bin/python3 --no-python-downloads "$WORK/envs/data"
@@ -95,7 +110,7 @@ SMARTSPRAY_VISION_DEMO="$PWD/build-vision-release/smartspray_vision_demo" \
 "$WORK/envs/tests/bin/python" -m unittest discover -s tests -p 'test_*.py' -v
 "$WORK/envs/data/bin/python" -m unittest discover -s tests -p test_phenobench_data.py -v
 
-SMARTSPRAY_VISION_DEMO="$PWD/build-vision-debug/smartspray_vision_demo" \
+SMARTSPRAY_VISION_DEMO="$PWD/build-vision-release/smartspray_vision_demo" \
 "$WORK/envs/tests/bin/python" -m unittest discover -s tests -p test_demo_cli.py -v
 ```
 
@@ -142,4 +157,4 @@ The complete `run.json` (including scores, floating coordinates, IDs, classes, s
 
 Historical M3 numerical budgets, 32-image parity and 772-image validation remain prior evidence, not M5 reruns. No inference/planning implementation changes, retraining, re-export, full dataset audit or full validation run are required for this documentation-only reproduction fix.
 
-Data/weight/model/runtime/project-code rights remain separate. Preserve [PhenoBench attribution and license discrepancy](DATA.md), [model/upstream notices](BASELINE.md#third-party-notices) and [ORT provenance](INFERENCE.md#export-and-dependencies). The source archive includes only tracked content: no model, checkpoint, original dataset image or annotated field-image derivative. The local review package may retain the withheld annotated image for review, with [attribution and its exact distribution decision](assets/ATTRIBUTION.md). Reproduction does not validate calibration, real-time behavior, crop-damage prevention or hardware safety.
+Data/weight/model/runtime/project-code rights remain separate. Preserve [PhenoBench attribution and license discrepancy](DATA.md), [model/upstream notices](BASELINE.md#third-party-notices) and [ORT provenance](INFERENCE.md#export-and-dependencies). The source archive includes only tracked content, including the approved annotated illustration with [attribution and publication basis](assets/ATTRIBUTION.md). Models are separate release assets; the full dataset, original image collection, optimizer dumps and private evidence remain excluded. Reproduction does not validate calibration, real-time behavior, crop-damage prevention or hardware safety.

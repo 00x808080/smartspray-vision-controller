@@ -100,10 +100,10 @@ Inspection predictions use confidence=0.25, the same 1024 letterbox, class-aware
 
 ## Third-party notices
 
-- PhenoBench: attribution to the PhenoBench authors and [dataset/paper](https://www.phenobench.org/dataset.html); the unresolved archive/website license discrepancy is retained in [DATA](DATA.md). No original dataset image, annotated field-image derivative or checkpoint is distributed in Git or the source archive. The curated command chart and numeric trace have separate [asset provenance](assets/ATTRIBUTION.md).
+- PhenoBench: attribution to the PhenoBench authors and [dataset/paper](https://www.phenobench.org/dataset.html); the unresolved archive/website license discrepancy is retained in [DATA](DATA.md). The original dataset collection and checkpoints are absent from Git. One attributed annotated training-image derivative is included under the official dataset page's CC BY-SA 4.0 notice; the [asset provenance](assets/ATTRIBUTION.md) retains the conflicting archive notice. The v0.1.0 release supplies separately packaged models with [provenance and terms](../MODEL_CARD.md).
 - Ultralytics 8.4.163, official pretrained weights and resulting YOLO models: [AGPL-3.0](https://www.ultralytics.com/license), as declared by the publisher. ultralytics-thop declares AGPL-3.0; ultralytics-platform declares AGPL-3.0-only. Telemetry, sync and hosted integrations are disabled; no cloud account/tracker is used.
 - PyTorch/torchvision: upstream BSD terms plus bundled third-party notices. The installed torch wheel declares Apache-2.0, Apache-2.0 WITH LLVM-exception, BSD-2-Clause, BSD-3-Clause, BSL-1.0 and MIT; torchvision metadata declares BSD.
 - NVIDIA CUDA/cuDNN and other NVIDIA wheel components retain their separate [NVIDIA terms](https://docs.nvidia.com/cuda/eula/index.html).
 - NumPy's installed wheel declares BSD-3-Clause, 0BSD, MIT, Zlib and CC0-1.0; Pillow declares MIT-CMU; OpenCV declares Apache-2.0. Full distribution metadata/license inventory is kept with local run evidence.
 
-The project's own code license remains unset. These third-party notices do not establish commercial deployment or redistribution readiness.
+Project-authored source code is **AGPL-3.0-only**, Copyright (C) 2026 Sergey Gonchar; see [license scope](../NOTICE.md). Third-party and dataset conditions remain separate and are not replaced by that license.
