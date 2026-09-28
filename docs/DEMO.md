@@ -1,10 +1,12 @@
-# Native vision-to-command demo (M4)
+# Native vision-to-command demo
 
 `smartspray_vision_demo` runs decode, ONNX inference, weed selection, original-image center mapping, batch planning, virtual execution and static rendering in C++17. It reuses M3 vision, the shared mapper, controller, OpenCV and nlohmann-json. No Python/service/replay/GPU is invoked. Controller-only builds and prior executables remain available.
 
+The [saved trace](../examples/frozen-demo/README.md) and [command timeline](assets/timeline.png) can be inspected without installing the model or runtime. [Asset attribution](assets/ATTRIBUTION.md) records provenance and the annotated-image distribution decision.
+
 ## Verified invocation and artifacts
 
-Use the [portable README quickstart](../README.md#quickstart) after provisioning the pinned runtime, verified model and single image as described in [REPRODUCIBILITY](REPRODUCIBILITY.md). All four CLI options are required and accept user-supplied paths; the old owner `.local` layout is not required.
+Use the [portable README quickstart](../README.md#run-the-native-vision-demo) after provisioning the pinned runtime, verified model and single image as described in [REPRODUCIBILITY](REPRODUCIBILITY.md). All four CLI options are required and accept user-supplied paths; no owner workflow files are required.
 
 Output parent must exist; output directory must not exist (including empty directories/symlinks). Repeat into a fresh folder. The model/image CMake options also register the actual real-model smoke inputs.
 
@@ -14,7 +16,7 @@ Output parent must exist; output directory must not exist (including empty direc
 | Training image `05-15_00028_P0030852.png` | `43aa736cfa133817c93ea33269e7835a274577ef3a35c863c27546aa9e8bd9ba` |
 | Committed `configs/demo.json` bytes | `39256507b0e8cb7c2d8dedb3d8c40e35a623ea6a6185351c3010574f7335328c` |
 
-Image/model binaries are local and absent from the source archive. This is the first pre-existing M2.2 smoke training ID, also among inspected M2.1 previews. Image ID/hash and the M3 profile were frozen before M4 predictions; the sample was not searched for favorable results. It is a demonstration, not evaluation.
+Original input-image/model binaries are external and absent from the source archive. The saved JSON/CSV and command chart are included for inspection. This is the first pre-existing M2.2 smoke training ID, also among inspected M2.1 previews. Image ID/hash and the M3 profile were frozen before M4 predictions; the sample was not searched for favorable results. It is a demonstration, not evaluation.
 
 ## Simulation and inference
 
@@ -79,6 +81,6 @@ Debug uses its corresponding executable directory. Without real-model/image CMak
 
 Predictions are not ground truth. Missed weeds, misclassification and imperfect boxes remain possible; excluding predicted crops does not establish avoidance of crop damage. This training sample does not establish independent field generalization, physical spraying, real-time performance, calibration, safety or chemical savings.
 
-Original image/model files are unchanged. Dataset/model binaries, visual derivatives and session records stay outside Git. Existing PhenoBench license discrepancy/split overlap and separate model/runtime/code rights remain in [DATA](DATA.md), [BASELINE](BASELINE.md) and [INFERENCE](INFERENCE.md). Local presentation is not publication authorization.
+Original image/model files are unchanged. Dataset/model binaries, the annotated field-image derivative and session records stay outside Git. The curated command chart and saved numeric example are the documented exception. Existing PhenoBench license discrepancy/split overlap and separate model/runtime/code rights remain in [DATA](DATA.md), [BASELINE](BASELINE.md) and [INFERENCE](INFERENCE.md). The asset-specific distribution decision is recorded in [attribution](assets/ATTRIBUTION.md).
 
 M4 evidence is preserved unchanged. M5 fresh-checkout verification and final packaging are recorded in [REPRODUCIBILITY](REPRODUCIBILITY.md).

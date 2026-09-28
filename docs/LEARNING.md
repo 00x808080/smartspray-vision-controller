@@ -1,6 +1,6 @@
 # Controller technical notes
 
-The [project specification](PROJECT.md) defines the contract; [README](../README.md) contains verified build/run commands and the current batch demo output. APIs are declared in [controller.hpp](../src/controller.hpp).
+The [project specification](PROJECT.md) defines the contract; [README](../README.md) contains verified build/run commands and links to the saved vision demo. This document explains the separate synthetic controller example. APIs are declared in [controller.hpp](../src/controller.hpp).
 
 ## Planning results
 
@@ -42,4 +42,4 @@ The executor trusts its documented valid-input precondition: a complete sorted s
 
 [controller_tests.cpp](../tests/controller_tests.cpp) retains all 20 M1.1 scenarios and adds 20 M1.2 scenarios, including direct interval fixtures, end-to-end target checks, all 120 permutations of one mixed input, numeric limits, and planner/executor independence. The throwing `require` helper stays active under `NDEBUG`. Debug, Release, and UBSan checks passed.
 
-Planning decides valid commands; execution records their application to virtual states. This establishes specified virtual command behavior only. It does not establish physical spray accuracy, real-time guarantees, hardware safety, or user understanding.
+Planning decides valid commands; execution records their application to virtual states. This establishes specified virtual command behavior only. It does not establish physical spray accuracy, real-time guarantees, hardware safety.

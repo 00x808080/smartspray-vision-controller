@@ -1,4 +1,4 @@
-# Reproduction and final MVP handoff (M5)
+# Reproducibility and verified environment
 
 This verifies a fresh GitHub checkout, fresh native builds and new Python environments on the **existing Ubuntu/WSL host**. It is not a clean OS, second-machine test, public release or promise of bit-identical retraining. The functional scope and M3 numerical budgets are unchanged.
 
@@ -6,12 +6,12 @@ This verifies a fresh GitHub checkout, fresh native builds and new Python enviro
 
 | Category | Contents |
 |---|---|
-| Tracked | C++/Python sources, tests, CMake, pinned requirements, configuration and technical documents |
+| Tracked | C++/Python sources, tests, CMake, pinned requirements, configuration, technical documents, curated command chart and saved JSON/CSV example |
 | Required for native demo | Owner-supplied ONNX and one image; official ORT CPU archive; declared Ubuntu libraries |
 | Optional training/evaluation | Original checkpoint, pretrained weights, full PhenoBench train/val, audit/derived labels and ML stack |
-| Generated/historical | Builds, environments, JSON/CSV/PNG outputs, M2-M4 evidence and local session records; absent from Git |
+| Generated/historical | Builds, environments, full evidence bundles, other JSON/CSV/PNG outputs and local session records; absent from Git |
 
-The owner copies the already exported `detector.onnx` and exact image into a separate inputs directory; no old `.local` tree is needed. Original owner artifacts are `.local/m3/model/detector.onnx` and `.local/m2.2/dataset/images/train/05-15_00028_P0030852.png` in the primary workspace. The latter source and hash were read from the actual M4 manifest. It is the first pre-existing M2.2 smoke training ID, frozen before M4 inference, not a sample selected for favorable predictions.
+Supply the already exported `detector.onnx` and an input image as separate files; no prior workflow notes or evidence tree are required. The exact trained model is currently an externally supplied artifact, with no project release/download link. The frozen demonstration image identity and hash were read from the original manifest. It is the first pre-existing M2.2 smoke training ID, frozen before M4 inference, not a sample selected for favorable predictions.
 
 | Artifact | SHA256 |
 |---|---|
@@ -47,16 +47,13 @@ env -i HOME="$HOME" USER="$USER" PATH=/usr/bin:/bin LANG=C.UTF-8 \
   bash --noprofile --norc
 ```
 
-Set `WORK` to a new absolute directory whose parent exists; `REVISION` to the exact reviewed commit; `UV` to the existing uv executable; and `OWNER_MODEL`, `OWNER_IMAGE`, `ORT_ARCHIVE` to the verified local source files. These are user-supplied paths, not repository defaults. On the tested host the existing uv is at `/home/pc/projects/smartspray-vision-controller/.local/m2.1/uv/uv`; only this installed tool is reused.
+Set `WORK` to a new absolute directory whose parent exists; `REVISION` to the exact reviewed commit; `UV` to the existing uv executable; and `OWNER_MODEL`, `OWNER_IMAGE`, `ORT_ARCHIVE` to the verified local source files. These are user-supplied paths, not repository defaults. `UV` may be any existing executable of the recorded version; no personal installation directory is required.
 
-The tested Git authentication uses the existing Windows GCM command below (no credentials are printed or stored). Adapt `GIT_HELPER` only if your existing helper differs. Create a fresh remote clone, not a local clone, shared object store or working-directory copy:
+Authenticate Git for the private repository using your existing credential setup before starting. Authentication is external to the project; no Windows-specific helper is required by these commands. Create a fresh remote clone, not a local clone, shared object store or working-directory copy:
 
 ```bash
 mkdir "$WORK"
-GIT_HELPER='/mnt/c/Program\ Files/Git/mingw64/bin/git-credential-manager.exe'
-git -c credential.https://github.com.helper="$GIT_HELPER" \
-  -c credential.https://github.com.username=00x808080 \
-  clone https://github.com/00x808080/smartspray-vision-controller.git "$WORK/source"
+git clone https://github.com/00x808080/smartspray-vision-controller.git "$WORK/source"
 git -C "$WORK/source" checkout --detach "$REVISION"
 mkdir -p "$WORK/inputs" "$WORK/deps" "$WORK/outputs" "$WORK/envs"
 cp "$OWNER_MODEL" "$WORK/inputs/detector.onnx"
@@ -72,7 +69,7 @@ export IMAGE="$WORK/inputs/05-15_00028_P0030852.png"
 export OUTPUT="$WORK/outputs/run-a"
 ```
 
-Require every hash to match the table before running. Use the [README quickstart](../README.md#quickstart) for controller and vision Release builds/tests and the native demo. Repeat Debug into fresh build directories. Repeat the demo from a fresh process with `OUTPUT="$WORK/outputs/run-b"`; never reuse an output directory. Neither native invocation needs an activated Python environment. `ldd build-vision-release/smartspray_vision_demo` must resolve ORT from the declared extracted release and OpenCV from system libraries, never from an old project build. CMake supplies the ORT runtime path; no global library-path setting is required.
+Require every hash to match the table before running. Use the [README quickstart](../README.md#getting-started) for controller and vision Release builds/tests and the native demo. Repeat Debug into fresh build directories. Repeat the demo from a fresh process with `OUTPUT="$WORK/outputs/run-b"`; never reuse an output directory. Neither native invocation needs an activated Python environment. `ldd build-vision-release/smartspray_vision_demo` must resolve ORT from the declared extracted release and OpenCV from system libraries, never from an old project build. CMake supplies the ORT runtime path; no global library-path setting is required.
 
 ## Existing Python suites
 
@@ -145,4 +142,4 @@ The complete `run.json` (including scores, floating coordinates, IDs, classes, s
 
 Historical M3 numerical budgets, 32-image parity and 772-image validation remain prior evidence, not M5 reruns. No inference/planning implementation changes, retraining, re-export, full dataset audit or full validation run are required for this documentation-only reproduction fix.
 
-Data/weight/model/runtime/project-code rights remain separate. Preserve [PhenoBench attribution and license discrepancy](DATA.md), [model/upstream notices](BASELINE.md#third-party-notices) and [ORT provenance](INFERENCE.md#export-and-dependencies). Local source/review archives contain no model, checkpoint or dataset images. The separate local presentation and small artifact backup are not public redistribution. Technical completion does not confirm the user's understanding or validate calibration, real-time behavior, crop-damage prevention or hardware safety.
+Data/weight/model/runtime/project-code rights remain separate. Preserve [PhenoBench attribution and license discrepancy](DATA.md), [model/upstream notices](BASELINE.md#third-party-notices) and [ORT provenance](INFERENCE.md#export-and-dependencies). The source archive includes only tracked content: no model, checkpoint, original dataset image or annotated field-image derivative. The local review package may retain the withheld annotated image for review, with [attribution and its exact distribution decision](assets/ATTRIBUTION.md). Reproduction does not validate calibration, real-time behavior, crop-damage prevention or hardware safety.

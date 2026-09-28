@@ -1,10 +1,10 @@
-# PhenoBench data audit and annotation adapter (M2.1)
+# PhenoBench data and annotation conventions
 
-## Scope and status
+## Scope and evidence
 
-M2.1 extracts ground-truth **crop** and **weed** objects from existing plant annotations. It does not train a model, run inference, create controller commands, or implement Python/C++ integration. M2.2 adds the [YOLO11n baseline](BASELINE.md) using this unchanged audit. The accepted decision is to continue a local educational portfolio experiment with attribution. This does not resolve the license discrepancy or crop-ID overlap and does not authorize dataset/image/checkpoint publication.
+The data adapter extracts annotated **crop** and **weed** objects from PhenoBench masks. This document retains the original audit (M2.1), conventions and split limitations used by the [trained baseline](BASELINE.md). Data preparation is separate from inference and simulated controller commands. The dataset/license discrepancy and crop-ID overlap remain documented facts; the narrow presentation assets and distribution status are listed in [attribution](assets/ATTRIBUTION.md).
 
-The proposed later simulation anchor is the center of a detected weed box in original-image pixels. It is not a verified stem location. No anchor or controller target is produced by this audit.
+The implemented demo uses the center of a detected weed box in original-image pixels as its simulation anchor. It is not a verified stem location. No anchor or controller target is produced by this audit.
 
 ## Provenance and rights
 
@@ -20,7 +20,7 @@ The audit candidate is the official [PhenoBench-v110.zip](https://www.phenobench
 
 The publisher supplies an MD5, not a published SHA256. The SHA256 above identifies the independently downloaded package; it is not a publisher signature. ZIP member paths, duplicate names, symlinks, encryption flags, and expected disk usage were checked before extraction. Standard `curl` and Python `zipfile` were used. Only labelled train/val and the README were extracted; hidden test content remains unopened inside the original archive. During M2.1, no unlabelled datasets, model weights, or predictions were downloaded. M2.2 separately records official pretrained weight provenance.
 
-**Unresolved license conflict:** the current website and [official FAQ](https://github.com/PRBonn/phenobench/blob/0edc128ef7f67c8c6577554c7d1a2e382e2ea81f/README.md#frequently-asked-questions) state **CC BY-SA 4.0**. The original archive's `PhenoBench/README.MD` instead states **CC BY-NC-SA 4.0**, including a noncommercial restriction. Both statements are retained locally; neither is silently substituted for the other. This audit does not establish publication or commercial-use rights. Images, derived previews, full object records, and detailed reports stay local. No authors were contacted. Dataset, model weights, model code, inference runtime, and this project's own code require separate rights decisions; the devkit's MIT license does not resolve the data conflict.
+**Unresolved license conflict:** the website captured during the 2026-09-20 audit and [official FAQ](https://github.com/PRBonn/phenobench/blob/0edc128ef7f67c8c6577554c7d1a2e382e2ea81f/README.md#frequently-asked-questions) state **CC BY-SA 4.0**. The original archive's `PhenoBench/README.MD` instead states **CC BY-NC-SA 4.0**, including a noncommercial restriction. Both statements are retained locally; neither is silently substituted for the other. This audit does not establish publication or commercial-use rights. Original images, annotated previews, full object records and detailed audit reports stay local. The curated command chart contains no dataset pixels; its numeric example and attribution are documented separately. No authors were contacted. Dataset, model weights, model code, inference runtime, and this project's own code require separate rights decisions; the devkit's MIT license does not resolve the data conflict.
 
 Local acquisition evidence includes the retrieved webpages, pinned devkit source, original archive notice, HTTP metadata, central directory, calculated checksums, extraction record, and evidence-file hashes. These are intentionally excluded from Git.
 
@@ -99,7 +99,7 @@ The M2.2 metric is native Ultralytics detection **AP averaged over IoU threshold
 
 Verified environment: Ubuntu 24.04 / WSL 2, existing CPython 3.12.3, uv 0.12.17, NumPy 2.5.3, Pillow 12.3.0. The isolated environment uses the existing system Python; it requires no OS package installation or replacement Python. Install uv according to its [official instructions](https://docs.astral.sh/uv/getting-started/installation/) if unavailable. The exact environment uses only the two packages in `requirements-data.txt`.
 
-From the repository root, with `uv` available (the audited local installation is `.local/m2.1/uv/uv`):
+From the repository root, with `uv` available:
 
 ```bash
 uv venv --python /usr/bin/python3 --no-python-downloads .venv
@@ -107,11 +107,11 @@ uv pip install --python .venv/bin/python --no-python-downloads --only-binary :al
 .venv/bin/python -m unittest discover -s tests -p 'test_phenobench_data.py' -v
 ```
 
-Create `.venv` only when absent; reuse a compatible existing environment rather than replacing it. Use the unchanged official package after validating its checksum, archive paths, size, and current rights. The data root is explicitly supplied and must contain `train/` and `val/`:
+Create `.venv` only when absent; reuse a compatible existing environment rather than replacing it. Use the unchanged official package after validating its checksum, archive paths, size, and current rights. Set `DATASET_ROOT` to your extracted PhenoBench directory. It must contain `train/` and `val/`; the quoted argument supports spaces:
 
 ```bash
-.venv/bin/python tools/audit_phenobench.py --dataset-root /path/to/PhenoBench --output .local/m2.1/run-a --previews 12
-.venv/bin/python tools/audit_phenobench.py --dataset-root /path/to/PhenoBench --output .local/m2.1/run-b --previews 12
+.venv/bin/python tools/audit_phenobench.py --dataset-root "$DATASET_ROOT" --output .local/m2.1/run-a --previews 12
+.venv/bin/python tools/audit_phenobench.py --dataset-root "$DATASET_ROOT" --output .local/m2.1/run-b --previews 12
 ```
 
 Output directories must be new and separate from the dataset. Compare the bytes of `report.json`, `summary.json`, `file_manifest.jsonl`, `images.jsonl`, `objects.jsonl`, `issues.jsonl`, `previews.json`, and preview PNGs across runs. Substantive artifacts contain no wall-clock timing or absolute source paths; acquisition dates and runtime logs are kept separately. Normal tests create only small temporary arrays/files and never download or require the real dataset.
